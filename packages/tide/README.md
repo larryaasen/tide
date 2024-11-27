@@ -26,8 +26,32 @@ Available positions: left, right, top, bottom
 
 ## TideConsole
 
+## Commands
+
+- tide.command.toggleStatusBarVisibility
+
+## TideCommandContribution
+
+### TideToggleStatusBarVisibilityContribution
+
+## Workbench
+
+## Panels
+
+## Status bar
+
+## Activity bar
+
+## Key bindings (Hot keys) (keyboard shortcuts)
+
 # Services
+
+## TideKeybindingService
+
+## TideWorkbenchLayoutService
 
 ## TideLoggingService
 
 ## TideTimeService
+
+## TideWorkbenchService

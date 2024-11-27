@@ -1,61 +1,33 @@
-import 'package:flutter/material.dart';
-
-import 'tide.dart';
 import 'tide_core.dart';
+
+class LoggerService {}
+
+class Menus {}
 
 class MenuModelRegistry extends TideRegistry {
   void registerMenuAction() {}
 }
 
-class Dependencies {
-  T get<T extends Object>() {
-    const instance = "";
-    return instance as T;
-  }
-}
-
 class MessageService {}
 
 class MenuContribution {
-  final deps = Dependencies();
   void registerMenus(MenuModelRegistry menus) {}
 }
 
-class MyMenuContribution implements MenuContribution {
-  MyMenuContribution();
-  @override
-  void registerMenus(MenuModelRegistry menus) {
-    final messageService = deps.get<MessageService>();
-    menus.registerMenuAction();
-  }
-
-  @override
-  // TODO: implement deps
-  Dependencies get deps => throw UnimplementedError();
-}
+// class MyMenuContribution implements MenuContribution {
+//   MyMenuContribution();
+//   @override
+//   void registerMenus(MenuModelRegistry menus) {
+//     final messageService = Tide.get<MessageService>();
+//     menus.registerMenuAction();
+//   }
+// }
 
 // final _ = GlobalRegistry.bind(MenuContribution, MyMenuContribution);
 
 // GlobalRegistry.bind(MenuContribution, MyMenuContribution);
 
-class Menus {}
-
 // final tideRegistry = GlobalRegistry();
-
-abstract class InterfaceA {
-  InterfaceA();
-
-  void methodA();
-}
-
-class ClassA implements InterfaceA {
-  ClassA();
-
-  @override
-  void methodA() {
-    print('methodA');
-  }
-}
 
 // class Container {
 //   final bindings = <Type, Type>{};
@@ -94,15 +66,3 @@ class ClassA implements InterfaceA {
 // final _hwA = GlobalRegistry.bind(
 //     TideActivityContribution, HelloworldActivityContribution);
 
-class TideSidebarActivityContribution extends TideActivityContribution {
-  TideSidebarActivityContribution();
-
-  @override
-  void registerActivities(TideActivityRegistry registry) {
-    registry.registerActivity(TideActivityBarItem(
-        title: 'Hello World',
-        icon: Icons.ac_unit,
-        commandId: Tide.ids.command.toggleSidebarVisibility,
-        position: TideActivityBarItemPosition.start));
-  }
-}

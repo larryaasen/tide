@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tide/tide.dart';
 
 /// Example 1: status bar with no panels.
@@ -33,15 +34,17 @@ void main4() {
 
 /// Example 5: left panel.
 void main5() {
+  final workbenchService = TideWorkbenchService();
+  workbenchService.layoutService.addPanel(const TidePanel());
+
   runApp(
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          // panels: const [TidePanel()],
-          panelBuilder: (panelId) {
+          workbenchService: workbenchService,
+          panelBuilder: (context, panelId) {
             return const TidePanelWidget(
               position: TidePosition.left,
-              height: double.infinity,
               resizeSide: TidePosition.right,
               child: Center(child: Text('Left Panel')),
             );
@@ -57,21 +60,20 @@ void main5() {
 void main6() {
   final leftPanelId = TideId.uniqueId();
   final rightPanelId = TideId.uniqueId();
+  final workbenchService = TideWorkbenchService();
+  workbenchService.layoutService.addPanel(TidePanel(panelId: leftPanelId));
+  workbenchService.layoutService.addPanel(TidePanel(panelId: rightPanelId));
 
   runApp(
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          // panels: [
-          //   TidePanel(panelId: leftPanelId),
-          //   TidePanel(panelId: rightPanelId)
-          // ],
-          panelBuilder: (panelId) {
+          workbenchService: workbenchService,
+          panelBuilder: (context, panelId) {
             if (panelId.id == leftPanelId.id) {
               return TidePanelWidget(
                 backgroundColor: Colors.red.shade100,
                 position: TidePosition.left,
-                height: double.infinity,
                 resizeSide: TidePosition.right,
                 child: const Center(child: Text('Left Panel')),
               );
@@ -79,7 +81,6 @@ void main6() {
               return TidePanelWidget(
                 backgroundColor: Colors.green.shade100,
                 position: TidePosition.right,
-                height: double.infinity,
                 resizeSide: TidePosition.left,
                 child: const Center(child: Text('Right Panel')),
               );
@@ -97,21 +98,20 @@ void main6() {
 void main7() {
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();
+  final workbenchService = TideWorkbenchService();
+  workbenchService.layoutService.addPanel(TidePanel(panelId: leftPanelId));
+  workbenchService.layoutService.addPanel(TidePanel(panelId: mainPanelId));
 
   runApp(
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          // panels: [
-          //   TidePanel(panelId: leftPanelId),
-          //   TidePanel(panelId: mainPanelId)
-          // ],
-          panelBuilder: (panelId) {
+          workbenchService: workbenchService,
+          panelBuilder: (context, panelId) {
             if (panelId.id == leftPanelId.id) {
               return const TidePanelWidget(
                 backgroundColor: Color(0xFF2C292F),
                 position: TidePosition.left,
-                height: double.infinity,
                 resizeSide: TidePosition.right,
                 child: Center(
                     child: Text('Left Panel',
@@ -121,7 +121,6 @@ void main7() {
               return const TidePanelWidget(
                 backgroundColor: Color(0xFF1B1B1B),
                 expanded: true,
-                height: double.infinity,
                 position: TidePosition.center,
                 child: Center(
                     child: Text('Main Panel',
@@ -143,31 +142,33 @@ void main7() {
   );
 }
 
-/// Example 9: left, middle, right, top, bottom panels, and status bar.
-void main9() {
+/// Example 8: left, middle, right, top, bottom panels, and status bar.
+void main8() {
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();
   final rightPanelId = TideId.uniqueId();
   final topPanelId = TideId.uniqueId();
   final bottomPanelId = TideId.uniqueId();
 
+  final workbenchService = TideWorkbenchService();
+
+  workbenchService.layoutService.addPanels([
+    TidePanel(panelId: leftPanelId),
+    TidePanel(panelId: mainPanelId),
+    TidePanel(panelId: rightPanelId),
+    TidePanel(panelId: topPanelId),
+    TidePanel(panelId: bottomPanelId),
+  ]);
+
   runApp(
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          // panels: [
-          //   TidePanel(panelId: leftPanelId),
-          //   TidePanel(panelId: mainPanelId),
-          //   TidePanel(panelId: rightPanelId),
-          //   TidePanel(panelId: topPanelId),
-          //   TidePanel(panelId: bottomPanelId),
-          // ],
-          panelBuilder: (panelId) {
+          workbenchService: workbenchService,
+          panelBuilder: (context, panelId) {
             if (panelId.id == leftPanelId.id) {
               return TidePanelWidget(
                 backgroundColor: Colors.red.shade100,
-                width: 200.0,
-                height: null,
                 position: TidePosition.left,
                 resizeSide: TidePosition.right,
                 child: const Center(child: Text('Left Panel')),
@@ -176,15 +177,12 @@ void main9() {
               return TidePanelWidget(
                 backgroundColor: Colors.blue.shade100,
                 expanded: true,
-                height: null,
                 position: TidePosition.center,
                 child: const Center(child: Text('Main Panel')),
               );
             } else if (panelId.id == rightPanelId.id) {
               return TidePanelWidget(
                 backgroundColor: Colors.green.shade100,
-                width: 200.0,
-                height: null,
                 position: TidePosition.right,
                 resizeSide: TidePosition.left,
                 child: const Center(child: Text('Right Panel')),
@@ -192,8 +190,6 @@ void main9() {
             } else if (panelId.id == topPanelId.id) {
               return TidePanelWidget(
                 backgroundColor: Colors.orange.shade100,
-                width: double.infinity,
-                height: 100.0,
                 position: TidePosition.top,
                 resizeSide: TidePosition.bottom,
                 child: const Center(child: Text('Top Panel')),
@@ -201,8 +197,6 @@ void main9() {
             } else if (panelId.id == bottomPanelId.id) {
               return TidePanelWidget(
                 backgroundColor: Colors.purple.shade100,
-                width: double.infinity,
-                height: 200.0,
                 position: TidePosition.bottom,
                 resizeSide: TidePosition.top,
                 child: const Center(child: Text('Bottom Panel')),
@@ -216,8 +210,8 @@ void main9() {
   );
 }
 
-/// Example 10: bottom panel containing a console widget, logging service, and status bar.
-void main10() {
+/// Example 9: bottom panel containing a console widget, logging service, and status bar.
+void main9() {
   final logging = TideLoggingService();
   int messageIndex = 1;
 
@@ -226,16 +220,18 @@ void main10() {
     messageIndex++;
   });
 
+  final workbenchService = TideWorkbenchService();
+
+  workbenchService.layoutService.addPanel(const TidePanel());
+
   runApp(
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          // panels: const [TidePanel()],
-          panelBuilder: (panelId) {
+          workbenchService: workbenchService,
+          panelBuilder: (context, panelId) {
             return TidePanelWidget(
               backgroundColor: Colors.purple.shade100,
-              // width: double.infinity,
-              // height: 200.0,
               position: TidePosition.bottom,
               resizeSide: TidePosition.top,
               child: TideConsole(
@@ -251,8 +247,11 @@ void main10() {
   );
 }
 
-/// Example 11: time item, some text items, and status bar.
-void main11() {
+/// Example 10: time status bar item, some text status bar items, and status bar.
+void main10() {
+  final tide = Tide();
+  tide.initialize(services: [Tide.ids.service.time]);
+
   runApp(
     TideApp(
       home: TideWindow(
@@ -274,12 +273,17 @@ void main11() {
   );
 }
 
-/// Example 12: activity bar.
-void main12() {
+/// Example 11: activity bar.
+void main11() {
+  final tide = Tide();
+  tide.initialize(services: [Tide.ids.service.time]);
+  final workbenchService = TideWorkbenchService();
+
   runApp(
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
+          workbenchService: workbenchService,
           activityBar: const TideActivityBar(
             items: [
               TideActivityBarItem(
@@ -293,11 +297,10 @@ void main12() {
             ],
           ),
           // panels: const [TidePanel()],
-          panelBuilder: (panelId) {
+          panelBuilder: (context, panelId) {
             return const TidePanelWidget(
               backgroundColor: Color(0xFFF3F3F3),
               position: TidePosition.right,
-              height: double.infinity,
               resizeSide: TidePosition.left,
               child: Center(child: Text('Right Panel')),
             );
@@ -313,14 +316,12 @@ void main12() {
   );
 }
 
-/// Example 13: initialization, activity bar.
-void main() {
+/// Example 12: initialization, activity bar, toggle status bar command.
+void main12() {
   final tide = Tide();
   tide.initialize(services: [Tide.ids.service.time]);
-  tide.addExtension();
 
-  final workbenchAccessor = TideServicesAccessor.asNewInstance();
-  final workbenchService = TideWorkbenchService(accessor: workbenchAccessor);
+  final workbenchService = TideWorkbenchService();
   workbenchService.layoutService.addPanel(const TidePanel());
 
   runApp(
@@ -333,7 +334,7 @@ void main() {
               TideActivityBarItem(
                 title: 'Explorer',
                 icon: Icons.file_copy_outlined,
-                commandId: Tide.ids.command.toggleSidebarVisibility,
+                commandId: Tide.ids.command.toggleStatusBarVisibility,
               ),
               const TideActivityBarItem(
                   title: 'Search', icon: Icons.search_outlined),
@@ -345,12 +346,11 @@ void main() {
                   position: TideActivityBarItemPosition.end),
             ],
           ),
-          panelBuilder: (panelId) {
+          panelBuilder: (context, panelId) {
             return TidePanelWidget(
               panelId: panelId,
               backgroundColor: const Color(0xFFF3F3F3),
               position: TidePosition.right,
-              height: double.infinity,
               resizeSide: TidePosition.left,
               child: const Center(child: Text('Right Panel')),
             );
@@ -366,4 +366,193 @@ void main() {
       ),
     ),
   );
+}
+
+/// Example 13: keyboard binding and status bar.
+void main13() {
+  final tide = Tide();
+  tide.initialize(services: [Tide.ids.service.keybindings]);
+  final bindings = Tide.get<TideKeybindingService>();
+  bindings.addBinding(
+    TideKeybinding(
+        keySet: LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.keyC),
+        commandId: Tide.ids.command.toggleStatusBarVisibility),
+  );
+
+  final workbenchService = TideWorkbenchService();
+  workbenchService.layoutService.addPanel(const TidePanel());
+
+  runApp(
+    TideApp(
+      home: TideWindow(
+        workbench: TideWorkbench(
+          workbenchService: workbenchService,
+          activityBar: TideActivityBar(
+            items: [
+              TideActivityBarItem(
+                title: 'Explorer',
+                icon: Icons.file_copy_outlined,
+                commandId: Tide.ids.command.toggleStatusBarVisibility,
+              ),
+            ],
+          ),
+          panelBuilder: (context, panelId) {
+            return TidePanelWidget(
+              panelId: panelId,
+              backgroundColor: const Color(0xFFF3F3F3),
+              position: TidePosition.left,
+              resizeSide: TidePosition.right,
+              child: const Center(child: Text('Left Panel')),
+            );
+          },
+          statusBar: const TideStatusBar(),
+        ),
+      ),
+    ),
+  );
+}
+
+/// Example 14: keyboard binding, custom command, and left panel.
+void main14() {
+  final tide = Tide();
+
+  tide.initialize(services: [Tide.ids.service.keybindings]);
+  final bindings = Tide.get<TideKeybindingService>();
+  bindings.addBinding(
+    TideKeybinding(
+        keySet: LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.keyC),
+        commandId: Tide.ids.command.toggleStatusBarVisibility),
+  );
+
+  final workbenchService = TideWorkbenchService();
+  final leftPanelId = TideId.uniqueId();
+  workbenchService.layoutService.addPanel(TidePanel(panelId: leftPanelId));
+
+  const togglePanelVisibility = TideId('app.command.toggleLeftPanelVisibility');
+
+  Tide.registerCommandContribution(
+    TideTogglePanelVisibilityContribution(
+      commandId: togglePanelVisibility,
+      panelId: leftPanelId,
+    ),
+  );
+
+  runApp(
+    TideApp(
+      home: TideWindow(
+        workbench: TideWorkbench(
+          workbenchService: workbenchService,
+          activityBar: const TideActivityBar(
+            items: [
+              TideActivityBarItem(
+                title: 'Explorer',
+                icon: Icons.file_copy_outlined,
+                commandId: togglePanelVisibility,
+              ),
+            ],
+          ),
+          panelBuilder: (context, panelId) {
+            return TidePanelWidget(
+              panelId: panelId,
+              backgroundColor: const Color(0xFFF3F3F3),
+              position: TidePosition.left,
+              resizeSide: TidePosition.right,
+              child: const Center(child: Text('Left Panel')),
+            );
+          },
+          statusBar: const TideStatusBar(),
+        ),
+      ),
+    ),
+  );
+}
+
+/// Example 15: keyboard binding, custom command, left panel calendar, and main panel.
+void main() {
+  final tide = Tide();
+  final leftPanelId = TideId.uniqueId();
+  final mainPanelId = TideId.uniqueId();
+
+  tide.initialize(
+      services: [Tide.ids.service.keybindings, Tide.ids.service.time]);
+
+  final bindings = Tide.get<TideKeybindingService>();
+  bindings.addBinding(
+    TideKeybinding(
+        keySet: LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.keyC),
+        commandId: Tide.ids.command.toggleStatusBarVisibility),
+  );
+
+  final workbenchService = TideWorkbenchService();
+  workbenchService.layoutService.addPanels([
+    TidePanel(panelId: leftPanelId),
+    TidePanel(panelId: mainPanelId),
+  ]);
+
+  const togglePanelVisibility = TideId('app.command.toggleLeftPanelVisibility');
+
+  Tide.registerCommandContribution(
+    TideTogglePanelVisibilityContribution(
+      commandId: togglePanelVisibility,
+      panelId: leftPanelId,
+    ),
+  );
+
+  runApp(
+    TideApp(
+      home: TideWindow(
+        workbench: TideWorkbench(
+          workbenchService: workbenchService,
+          activityBar: const TideActivityBar(
+            items: [
+              TideActivityBarItem(
+                title: 'Explorer',
+                icon: Icons.file_copy_outlined,
+                commandId: togglePanelVisibility,
+              ),
+            ],
+          ),
+          panelBuilder: (context, panelId) {
+            if (panelId.id == leftPanelId.id) {
+              return TidePanelWidget(
+                panelId: panelId,
+                backgroundColor: const Color(0xFFF3F3F3),
+                position: TidePosition.left,
+                resizeSide: TidePosition.right,
+                minWidth: 100,
+                maxWidth: 450,
+                initialWidth: 220,
+                child: const TideCalendarDayPane(),
+              );
+            } else if (panelId.id == mainPanelId.id) {
+              return TidePanelWidget(
+                backgroundColor: Colors.white,
+                expanded: true,
+                position: TidePosition.center,
+                child: Container(
+                    height: double.infinity,
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text('Notes',
+                        style: Theme.of(context).textTheme.headlineSmall)),
+              );
+            }
+            return null;
+          },
+          statusBar: const TideStatusBar(
+            items: [
+              TideStatusBarItemTime(
+                  position: TideStatusBarItemPosition.right,
+                  use24HourFormat: false)
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+/// Example 20: add extension.
+void main20() {
+  final tide = Tide();
+  tide.addExtension();
 }

@@ -1,4 +1,5 @@
-import 'tide_core.dart';
+import '../tide.dart';
+import '../tide_core.dart';
 
 typedef TideCommandHandler = void Function(TideCommand command,
     TideCommandParams commandParams, TideServicesAccessor accessor);
@@ -6,8 +7,8 @@ typedef TideCommandHandlersMap = Map<String, TideCommandHandler>;
 typedef TideCommandParams = Map<String, Object>;
 typedef TideCommandsMap = Map<String, TideCommand>;
 
-/// Commands are runnable actions defined by an ID and the handler function to be executed.
-abstract class TideCommand {
+/// Commands are runnable actions defined by an ID and a title.
+class TideCommand {
   TideCommand({required this.id, this.title});
 
   final TideId id;
@@ -21,15 +22,15 @@ abstract class TideCommand {
 
 class TideCommandRegistry {
   final _commands = TideCommandsMap();
-  final _handlers = TideCommandHandlersMap();
+  final _handlers = TideCommandHandlersMap(); // maybe at this to TideCommand.
 
   /// Connects a command with a handler function that can interact with the services.
-  void registerCommand(TideCommand command, TideCommandHandler handler) {
-    final commandId = command.id;
+  void registerCommand(
+      TideId commandId, String title, TideCommandHandler handler) {
     if (_commands.containsKey(commandId.id)) {
       throw Exception('Command already registered: $commandId');
     }
-    _commands[commandId.id] = command;
+    _commands[commandId.id] = TideCommand(id: commandId, title: title);
     _handlers[commandId.id] = handler;
   }
 
@@ -51,7 +52,7 @@ class TideCommandRegistry {
     if (command == null) {
       throw Exception('Tide: Command not found: $commandId');
     }
-    print('Tide: execute handler for $command');
+    Tide.log('Tide: execute handler for $command');
 
     handler(command, commandParams, accessor);
   }

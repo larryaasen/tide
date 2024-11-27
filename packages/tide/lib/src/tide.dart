@@ -2,10 +2,11 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import 'commands/tide_command.dart';
+import 'commands/tide_contributions.dart';
 import 'services/tide_time_service.dart';
-import 'tide_commands.dart';
 import 'tide_core.dart';
-import 'tide_resizer.dart';
+import 'widgets/tide_panel_widget.dart';
 import 'widgets/tide_workbench.dart';
 
 /*
@@ -63,6 +64,12 @@ class TideStatusBarItemText extends TideStatusBarItem {
   Widget build(BuildContext context) => super.buildBarItem(context, text);
 }
 
+/// A status bar item that displays the current time.
+/// Make sure to initialize the time service like this:
+/// ```dart
+/// final tide = Tide();
+/// tide.initialize(services: [Tide.ids.service.time]);');
+/// ```
 class TideStatusBarItemTime extends TideStatusBarItem {
   const TideStatusBarItemTime(
       {super.key, super.position, this.use24HourFormat = false});
@@ -71,11 +78,22 @@ class TideStatusBarItemTime extends TideStatusBarItem {
 
   @override
   Widget build(BuildContext context) {
+    TideTimeService? timeService;
+    try {
+      timeService = Tide.get<TideTimeService>();
+    } catch (e) {
+      Tide.log(
+          'The TideTimeService is not registered. Did you forget to initialize the service?\n'
+          'Example:\n'
+          '  final tide = Tide();\n'
+          '  tide.initialize(services: [Tide.ids.service.time]);');
+      throw Exception('TideTimeService is not registered.');
+    }
     return StreamBuilder(
-      stream: Tide.get<TideTimeService>().stream,
+      stream: timeService.stream,
       builder: (context, snapshot) {
         final text = snapshot.hasData
-            ? (snapshot.data as DiveTimeState)
+            ? (snapshot.data as TideDiveTimeState)
                 .timeFormatted(use24HourFormat: use24HourFormat)
             : '';
         return super.buildBarItem(context, text);
@@ -128,75 +146,33 @@ class TideStatusBar extends StatelessWidget {
 
 /// Data model for a workbench panel.
 class TidePanel extends Equatable {
-  const TidePanel({
-    this.panelId = TideId.empty,
-    this.isVisible = true,
-
-    // this.backgroundColor = Colors.grey,
-    // this.position = TidePosition.left,
-    // this.width = 200.0,
-    // this.height = 200.0,
-    // this.expanded = false,
-    // this.resizeSide,
-    // this.child,
-  });
+  const TidePanel(
+      {this.panelId = TideId.empty,
+      this.isVisible = true,
+      this.initialWidth = 200.0});
 
   final TideId panelId;
   final bool isVisible;
+  final double initialWidth;
+
+  // final Color backgroundColor;
+  // final TidePosition position;
+  // final double? height;
+  // final bool expanded;
+  // final TidePosition? resizeSide;
 
   @override
-  List<Object?> get props => [panelId, isVisible];
+  List<Object?> get props => [panelId, isVisible, initialWidth];
 
   TidePanel copyWith({
     TideId? panelId,
     bool? isVisible,
+    double? initialWidth,
   }) {
     return TidePanel(
       panelId: panelId ?? this.panelId,
       isVisible: isVisible ?? this.isVisible,
-    );
-  }
-
-  // final Color backgroundColor;
-  // final TidePosition position;
-  // final double? width;
-  // final double? height;
-  // final bool expanded;
-  // final TidePosition? resizeSide;
-  // final Widget? child;
-}
-
-class TidePanelWidget extends StatelessWidget {
-  const TidePanelWidget({
-    super.key,
-    this.panelId = TideId.empty,
-    this.backgroundColor = Colors.grey,
-    this.position = TidePosition.left,
-    this.width = 200.0,
-    this.height = 200.0,
-    this.expanded = false,
-    this.resizeSide,
-    this.child,
-  });
-
-  final TideId panelId;
-  final Color backgroundColor;
-  final TidePosition position;
-  final double? width;
-  final double? height;
-  final bool expanded;
-  final TidePosition? resizeSide;
-  final Widget? child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      // width: width,
-      // height: height,
-      color: backgroundColor,
-      child: resizeSide != null && child != null
-          ? TideResizer(resizeSide: resizeSide!, child: child!)
-          : child,
+      initialWidth: initialWidth ?? this.initialWidth,
     );
   }
 }
@@ -261,19 +237,20 @@ class _TideActivityBarState extends State<TideActivityBar> {
 
     final widgets = allItems.map((item) {
       final index = allItems.indexOf(item);
-      if (item is! TideActivityBarItem) {
-        return item as Widget;
+      if (item is! TideActivityBarItem && item is Widget) {
+        return item;
       }
 
+      final barItem = item as TideActivityBarItem;
+
       return IconButton(
-        icon: Icon(item.icon,
+        icon: Icon(barItem.icon,
             color: index == _selectedIndex ? Colors.white : Colors.grey),
-        tooltip: item.title,
+        tooltip: barItem.title,
         onPressed: () {
-          if (item.commandId != null) {
-            Tide.get<TideCommands>()
-                .registry
-                .executeCommand(item.commandId!, item.commandParams, accessor);
+          if (barItem.commandId != null) {
+            Tide.get<TideCommands>().registry.executeCommand(
+                barItem.commandId!, barItem.commandParams, accessor);
           }
           setState(() => _selectedIndex = index);
         },
@@ -403,38 +380,6 @@ abstract class TideKeybindingContribution {
   void registerKeybindings(TideActivityRegistry registry);
 }
 
-/*
-View: Toggle Primary Side Bar Visibility
-{
-  "key": "cmd+b",
-  "command": "workbench.action.toggleSidebarVisibility"
-}
-*/
-
-class TideToggleSidebarVisibilityCommand extends TideCommand {
-  TideToggleSidebarVisibilityCommand()
-      : super(
-            id: Tide.ids.command.toggleSidebarVisibility,
-            title: 'Toggle Primary Side Bar Visibility');
-}
-
-class TideToggleSidebarVisibilityContribution extends TideCommandContribution {
-  TideToggleSidebarVisibilityContribution();
-
-  @override
-  void registerCommands(TideCommandRegistry registry) {
-    registry.registerCommand(TideToggleSidebarVisibilityCommand(),
-        (TideCommand command, TideCommandParams commandParams,
-            TideServicesAccessor accessor) {
-      print('toggle panel visibility');
-      final panelId = commandParams['panelId'] as TideId? ?? TideId.empty;
-      final layoutService = accessor.get<TideWorkbenchLayoutService>();
-      final visible = layoutService.getPanelVisible(panelId);
-      layoutService.setPanelVisible(panelId, !visible);
-    });
-  }
-}
-
 class TideCommands {
   final registry = TideCommandRegistry();
 }
@@ -449,10 +394,14 @@ class Tide {
   /// The one [GetIt] instance for Tide level instances.
   static GetIt get get => _getIt;
 
-  final _serviceIds = <String, TideCreateHandler>{};
+  /// Optional services that can be started.
+  final _servicesAvailable = <String, TideCreateHandler>{};
+
+  bool isServiceAvailable(String serviceId) =>
+      _servicesAvailable.containsKey(serviceId);
 
   /// The one [TideCommands] instance for all workbenches.
-  TideCommands get commands => get<TideCommands>();
+  static TideCommands get commands => get<TideCommands>();
 
   static final ids = TideIds();
 
@@ -460,10 +409,24 @@ class Tide {
   Tide() {
     get.registerSingleton(TideCommands());
 
-    TideToggleSidebarVisibilityContribution()
+    TideToggleStatusBarVisibilityContribution()
         .registerCommands(commands.registry);
 
     _registerOptionalServices();
+  }
+
+  /// System log.
+  static log(Object? object) {
+    // final loggingService = get<TideLoggingService>();
+    // loggingService.log(message);
+
+    // ignore: avoid_print
+    print(object);
+  }
+
+  static void registerCommandContribution(
+      TideCommandContribution contribution) {
+    contribution.registerCommands(Tide.commands.registry);
   }
 
   /// Initialize the Tide instance, and register the built-in services.
@@ -478,13 +441,17 @@ class Tide {
 
   void _registerOptionalServices() {
     // Add each optional service to the registry.
-    _serviceIds[ids.service.time.id] =
+
+    _servicesAvailable[ids.service.keybindings.id] = () =>
+        get.registerSingleton<TideKeybindingService>(TideKeybindingService());
+
+    _servicesAvailable[ids.service.time.id] =
         () => get.registerSingleton<TideTimeService>(TideTimeService());
   }
 
   void _instantiateOptionalServices(List<TideId> services) {
     for (final serviceId in services) {
-      final createHandler = _serviceIds[serviceId.id];
+      final createHandler = _servicesAvailable[serviceId.id];
       if (createHandler != null) {
         createHandler();
       }
@@ -493,12 +460,13 @@ class Tide {
 }
 
 class TideCommandIds {
-  final toggleSidebarVisibility =
-      const TideId('tide.command.toggleSidebarVisibility');
+  final toggleStatusBarVisibility =
+      const TideId('tide.command.toggleStatusBarVisibility');
 }
 
 class TideServiceIds {
   final time = const TideId('tide.service.time');
+  final keybindings = const TideId('tide.service.keybindings');
 }
 
 class TideIds {

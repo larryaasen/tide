@@ -1,7 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:uuid/uuid.dart';
 
-/// A service accessor for the Tide services.
+/// A service accessor for the Tide services to get instance to objects.
 typedef TideServicesAccessor = GetIt;
 
 enum TidePosition { left, top, center, right, bottom }

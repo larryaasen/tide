@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../tide.dart';
 import 'tide_workbench.dart';
 
 class TideWindow extends StatelessWidget {
   TideWindow({super.key, this.workbench}) {
-    print("Tide: TideWindow created");
+    Tide.log("Tide: TideWindow created");
   }
 
   // final Tide tide;
