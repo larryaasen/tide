@@ -47,9 +47,11 @@ class TideTimeService {
   }
 
   /// Create a StreamController
-  final _controller = StreamController<TideDiveTimeState>();
+  final _controller = StreamController<TideDiveTimeState>.broadcast();
 
   Stream<TideDiveTimeState> get stream => _controller.stream;
+  DateTime get currentTime => DateTime.now();
+  TideDiveTimeState get currentTimeState => TideDiveTimeState(currentTime);
 
   /// Update the state.
   void _updateState(TideDiveTimeState newState) {
@@ -64,7 +66,6 @@ class TideTimeService {
 
   /// The timer went off.
   void _onTimer(Timer timer) {
-    final time = DateTime.now();
-    _updateState(TideDiveTimeState(time));
+    _updateState(currentTimeState);
   }
 }

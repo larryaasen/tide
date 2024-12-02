@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tide/tide.dart';
 
 import 'tide_window.dart';
 

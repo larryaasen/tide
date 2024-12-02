@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:get_it/get_it.dart';
 import 'package:uuid/uuid.dart';
 
@@ -6,10 +7,13 @@ typedef TideServicesAccessor = GetIt;
 
 enum TidePosition { left, top, center, right, bottom }
 
-class TideId {
+class TideId extends Equatable {
   const TideId(this.id);
 
   final String id;
+
+  @override
+  List<Object?> get props => [id];
 
   @override
   String toString() {

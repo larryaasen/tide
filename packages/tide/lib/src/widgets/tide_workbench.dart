@@ -1,36 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../activity_bar/tide_activity_bar.dart';
+import '../services/tide_keybinding_service.dart';
+import '../services/tide_workbench_layout_service.dart';
 import '../services/tide_workbench_service.dart';
 import '../tide.dart';
 import '../tide_core.dart';
 import 'tide_panel_widget.dart';
 
-typedef TideWorkbenchPanelBuilder = TidePanelWidget? Function(
-    BuildContext context, TideId panelId);
+typedef TideActivityBarBuilder = TideActivityBar? Function(
+    BuildContext context, TideId barId);
+typedef TidePanelBuilder = TidePanelWidget? Function(
+    BuildContext context, TidePanel panel);
 
-/// A workbench.
+/// A workbench widget.
 class TideWorkbench extends StatelessWidget {
   TideWorkbench({
     super.key,
-    TideWorkbenchService? workbenchService,
+    this.activityBarBuilder,
     this.panelBuilder,
-    this.activityBar,
     this.statusBar = const TideStatusBar(),
     this.backgroudColor = Colors.white,
-  }) : workbenchService = workbenchService ?? TideWorkbenchService() {
+  }) {
     Tide.log("Tide: TideWorkbench created");
 
     if (!Tide.get.isRegistered<TideWorkbenchService>()) {
-      Tide.get.registerSingleton<TideWorkbenchService>(this.workbenchService);
+      throw Exception('TideWorkbenchService is not registered.');
     }
   }
 
-  final TideWorkbenchService workbenchService;
-  final TideWorkbenchPanelBuilder? panelBuilder;
-  final TideActivityBar? activityBar;
+  final TideActivityBarBuilder? activityBarBuilder;
+  final TidePanelBuilder? panelBuilder;
   final TideStatusBar? statusBar;
   final Color backgroudColor;
+
+  TideWorkbenchService get workbenchService => Tide.get<TideWorkbenchService>();
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +43,6 @@ class TideWorkbench extends StatelessWidget {
       valueListenable:
           workbenchService.accessor.get<TideWorkbenchLayoutService>().state,
       builder: (context, state, child) {
-        Tide.log('Tide: TideWorkbench.build ');
         return _buildInternal(context, state);
       },
     );
@@ -46,28 +50,26 @@ class TideWorkbench extends StatelessWidget {
 
   Widget _buildInternal(BuildContext context, TideWorkbenchLayoutState state) {
     final accessor = workbenchService.accessor;
-    // final layoutService = workbenchService.layoutService;
+
+    // Get the activity bar widget
+    TideActivityBar? activityBarWidget;
+    if (activityBarBuilder != null && state.activityBar.isVisible) {
+      activityBarWidget = activityBarBuilder!(context, TideId.empty);
+    }
 
     final panels = state.panels;
     List<TidePanelWidget> builtPanels = [];
 
-    if (panels.isNotEmpty && panelBuilder == null) {
-      assert(false, 'panelBuilder is null');
-      return const SizedBox.shrink();
-    }
-
     // Remove the non-visible panels
-    if (panelBuilder != null) {
-      final visiblePanels = panels.where((panel) => panel.isVisible).toList();
+    final visiblePanels = panels.where((panel) => panel.isVisible).toList();
 
-      // Build the panels
-      builtPanels = visiblePanels.map((panel) {
-        final widget =
-            panelBuilder!(context, panel.panelId) ?? const TidePanelWidget();
-
-        return widget;
-      }).toList();
-    }
+    // Build the panels
+    builtPanels = visiblePanels.map((panel) {
+      if (panel.panelBuilder != null) {
+        return panel.panelBuilder!(context, panel) ?? const TidePanelWidget();
+      }
+      return panelBuilder!(context, panel) ?? const TidePanelWidget();
+    }).toList();
 
     final leftSide = builtPanels
         .where((panel) => panel.position == TidePosition.left)
@@ -93,15 +95,6 @@ class TideWorkbench extends StatelessWidget {
         if (widget.expanded) {
           return Expanded(child: widget);
         }
-        // if (widget.minWidth != null || widget.maxWidth != null) {
-        //   return ConstrainedBox(
-        //     constraints: BoxConstraints(
-        //       minWidth: widget.minWidth ?? 0,
-        //       maxWidth: widget.maxWidth ?? double.infinity,
-        //     ),
-        //     child: widget,
-        //   );
-        // }
       }
       return widget;
     }).toList();
@@ -121,7 +114,7 @@ class TideWorkbench extends StatelessWidget {
         Expanded(
           child: Row(
             children: [
-              if (activityBar != null) activityBar!,
+              if (activityBarWidget != null) activityBarWidget,
               Expanded(child: inner),
             ],
           ),
@@ -231,88 +224,3 @@ class TideShortcuts extends StatelessWidget {
     );
   }
 }
-
-class TideActivateIntent extends ActivateIntent {
-  const TideActivateIntent(this.keybinding);
-  final TideKeybinding keybinding;
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'TideActivateIntent: ${keybinding.keySet} to ${keybinding.commandId}';
-  }
-}
-
-class TideKeyboardListener extends StatelessWidget {
-  const TideKeyboardListener(
-      {super.key, required this.accessor, required this.child});
-
-  /// The accessor instance for this workbench.
-  final TideServicesAccessor accessor;
-
-  /// The widget below this widget in the tree.
-  ///
-  /// {@macro flutter.widgets.ProxyWidget.child}
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final keybindingService = Tide.get<TideKeybindingService>();
-
-    return FocusableActionDetector(
-      // focusNode: _focusNode,
-      autofocus: true,
-      shortcuts: keybindingService.shortcuts(),
-      actions: <Type, Action<Intent>>{
-        TideActivateIntent: CallbackAction<TideActivateIntent>(
-          onInvoke: (TideActivateIntent intent) {
-            Tide.log(intent);
-            Tide.get<TideCommands>().registry.executeCommand(
-                intent.keybinding.commandId,
-                {} /*item.commandParams*/,
-                accessor);
-
-            return null;
-          },
-        ),
-      },
-      child: child,
-    );
-  }
-}
-
-class TideKeybinding {
-  const TideKeybinding({required this.keySet, required this.commandId});
-  final LogicalKeySet keySet;
-  final TideId commandId;
-}
-
-/// This class is used to process key events and is a [Tide] level service.
-class TideKeybindingService {
-  TideKeybindingService() {
-    Tide.log("Tide: TideKeybindingService created");
-  }
-
-  final _keybindings = <TideKeybinding>[];
-
-  void addBinding(TideKeybinding keybinding) {
-    _keybindings.add(keybinding);
-  }
-
-  void addBindings(List<TideKeybinding> bindings) {
-    _keybindings.addAll(bindings);
-  }
-
-  Map<ShortcutActivator, Intent> shortcuts() {
-    var shortcuts = <LogicalKeySet, Intent>{};
-    for (final keybinding in _keybindings) {
-      shortcuts[keybinding.keySet] = TideActivateIntent(keybinding);
-    }
-    return shortcuts;
-  }
-
-  /// Called whenever this widget receives a keyboard event.
-  void onKeyEvent(KeyEvent event) {
-    Tide.log('Tide: TideKeybindingService key event: ${event.logicalKey}');
-  }
-}
-
-class TideUserKeybindings {}

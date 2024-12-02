@@ -2,6 +2,10 @@
 
 - Move classes to individual files.
 
+## Activity Bar
+
+- Add support for multiple activity bars.
+
 ## Status Bar
 
 - Allow any widget in a status bar item.
@@ -14,6 +18,27 @@
 
 - create a screen to display the hot key mapping.
 
+## Logging
+
+- Add support for multiple types of logging.
+
+## Menus
+
+- Add support for desktop menus.
+
+## Extensions
+
+- Implement extensions.
+
+## Workbench
+
+- Optimize the layout state by having more than one ValueNotifier.
+
+## CI
+
+- Setup CI jobs for each platform.
+
 ## Publishing
 
+- Update README
 - Prepare podspec.yaml file for pulication.

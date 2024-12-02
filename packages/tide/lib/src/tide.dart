@@ -2,14 +2,20 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import 'activity_bar/tide_activity_bar.dart';
 import 'commands/tide_command.dart';
 import 'commands/tide_contributions.dart';
+import 'services/tide_command_service.dart';
+import 'services/tide_keybinding_service.dart';
 import 'services/tide_time_service.dart';
+import 'services/tide_workbench_service.dart';
 import 'tide_core.dart';
 import 'widgets/tide_panel_widget.dart';
 import 'widgets/tide_workbench.dart';
 
 /*
+  Here are the Tide UI components.
+
   TideMainWindow
     - TideWindow
       - TideWorkbench
@@ -56,7 +62,10 @@ abstract class TideStatusBarItem extends StatelessWidget {
 }
 
 class TideStatusBarItemText extends TideStatusBarItem {
-  const TideStatusBarItemText({super.key, super.position, required this.text});
+  const TideStatusBarItemText(
+      {super.key,
+      super.position = TideStatusBarItemPosition.center,
+      required this.text});
 
   final String text;
 
@@ -75,7 +84,6 @@ class TideStatusBarItemTime extends TideStatusBarItem {
       {super.key, super.position, this.use24HourFormat = false});
 
   final bool use24HourFormat;
-
   @override
   Widget build(BuildContext context) {
     TideTimeService? timeService;
@@ -89,14 +97,15 @@ class TideStatusBarItemTime extends TideStatusBarItem {
           '  tide.initialize(services: [Tide.ids.service.time]);');
       throw Exception('TideTimeService is not registered.');
     }
-    return StreamBuilder(
+    return StreamBuilder<TideDiveTimeState>(
       stream: timeService.stream,
+      initialData: timeService.currentTimeState,
       builder: (context, snapshot) {
         final text = snapshot.hasData
             ? (snapshot.data as TideDiveTimeState)
                 .timeFormatted(use24HourFormat: use24HourFormat)
             : '';
-        return super.buildBarItem(context, text);
+        return TideStatusBarItemText(text: text);
       },
     );
   }
@@ -146,14 +155,17 @@ class TideStatusBar extends StatelessWidget {
 
 /// Data model for a workbench panel.
 class TidePanel extends Equatable {
-  const TidePanel(
-      {this.panelId = TideId.empty,
-      this.isVisible = true,
-      this.initialWidth = 200.0});
+  const TidePanel({
+    this.panelId = TideId.empty,
+    this.isVisible = true,
+    this.initialWidth = 200.0,
+    this.panelBuilder,
+  });
 
   final TideId panelId;
   final bool isVisible;
   final double initialWidth;
+  final TidePanelBuilder? panelBuilder;
 
   // final Color backgroundColor;
   // final TidePosition position;
@@ -162,106 +174,19 @@ class TidePanel extends Equatable {
   // final TidePosition? resizeSide;
 
   @override
-  List<Object?> get props => [panelId, isVisible, initialWidth];
+  List<Object?> get props => [panelId, isVisible, initialWidth, panelBuilder];
 
   TidePanel copyWith({
     TideId? panelId,
     bool? isVisible,
     double? initialWidth,
+    TidePanelBuilder? panelBuilder,
   }) {
     return TidePanel(
       panelId: panelId ?? this.panelId,
       isVisible: isVisible ?? this.isVisible,
       initialWidth: initialWidth ?? this.initialWidth,
-    );
-  }
-}
-
-enum TideActivityBarItemPosition {
-  start,
-  end,
-}
-
-class TideActivityBarItem {
-  const TideActivityBarItem({
-    required this.title,
-    required this.icon,
-    this.commandId,
-    this.commandParams = const {},
-    this.position = TideActivityBarItemPosition.start,
-  });
-
-  final String title;
-  final IconData icon;
-  final TideId? commandId;
-  final TideCommandParams commandParams;
-  final TideActivityBarItemPosition position;
-}
-
-class TideActivityBar extends StatefulWidget {
-  const TideActivityBar({
-    super.key,
-    this.backgroundColor = const Color(0xFF2C2C2C),
-    this.position = TidePosition.left,
-    this.width = 48.0,
-    this.items = const [],
-  });
-
-  final Color backgroundColor;
-  final TidePosition position;
-  final double width;
-  final List<TideActivityBarItem> items;
-
-  @override
-  State<TideActivityBar> createState() => _TideActivityBarState();
-}
-
-class _TideActivityBarState extends State<TideActivityBar> {
-  int _selectedIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    final accessor = TideWorkbenchAccessor.of(context).accessor;
-
-    final start = widget.items
-        .where((panel) => panel.position == TideActivityBarItemPosition.start)
-        .toList();
-    final end = widget.items
-        .where((panel) => panel.position == TideActivityBarItemPosition.end)
-        .toList();
-    final allItems = [
-      ...start,
-      if (start.isEmpty || end.isNotEmpty) const Spacer(),
-      ...end
-    ];
-
-    final widgets = allItems.map((item) {
-      final index = allItems.indexOf(item);
-      if (item is! TideActivityBarItem && item is Widget) {
-        return item;
-      }
-
-      final barItem = item as TideActivityBarItem;
-
-      return IconButton(
-        icon: Icon(barItem.icon,
-            color: index == _selectedIndex ? Colors.white : Colors.grey),
-        tooltip: barItem.title,
-        onPressed: () {
-          if (barItem.commandId != null) {
-            Tide.get<TideCommands>().registry.executeCommand(
-                barItem.commandId!, barItem.commandParams, accessor);
-          }
-          setState(() => _selectedIndex = index);
-        },
-      );
-    }).toList();
-
-    return Container(
-      width: widget.width,
-      height: double.infinity,
-      color: widget.backgroundColor,
-      child: Column(children: widgets),
+      panelBuilder: panelBuilder ?? this.panelBuilder,
     );
   }
 }
@@ -380,16 +305,14 @@ abstract class TideKeybindingContribution {
   void registerKeybindings(TideActivityRegistry registry);
 }
 
-class TideCommands {
-  final registry = TideCommandRegistry();
-}
-
 typedef TideCreateHandler = void Function();
 
 class Tide {
   // static final registry = TideGlobalRegistry();
 
   static final _getIt = GetIt.asNewInstance();
+
+  // workbenchService;
 
   /// The one [GetIt] instance for Tide level instances.
   static GetIt get get => _getIt;
@@ -400,19 +323,37 @@ class Tide {
   bool isServiceAvailable(String serviceId) =>
       _servicesAvailable.containsKey(serviceId);
 
-  /// The one [TideCommands] instance for all workbenches.
-  static TideCommands get commands => get<TideCommands>();
+  /// The one [TideCommandService] instance for all workbenches.
+  static TideCommandService get commandService => get<TideCommandService>();
+
+  /// The one [TideWorkbenchService] instance for all workbenches.
+  TideWorkbenchService get workbenchService => get<TideWorkbenchService>();
 
   static final ids = TideIds();
 
   /// Creates the [Tide] instance and registers the built-in features.
   Tide() {
-    get.registerSingleton(TideCommands());
+    _initialize();
+  }
 
-    TideToggleStatusBarVisibilityContribution()
-        .registerCommands(commands.registry);
-
+  void _initialize() {
+    _registerStandardServices();
+    _registerStandardCommands();
     _registerOptionalServices();
+  }
+
+  void _registerStandardServices() {
+    if (!get.isRegistered<TideCommandService>()) {
+      get.registerSingleton(TideCommandService());
+    }
+
+    if (!get.isRegistered<TideWorkbenchService>()) {
+      get.registerSingleton(TideWorkbenchService());
+    }
+  }
+
+  void _registerStandardCommands() {
+    registerCommandContribution(TideToggleStatusBarVisibilityContribution());
   }
 
   /// System log.
@@ -426,18 +367,24 @@ class Tide {
 
   static void registerCommandContribution(
       TideCommandContribution contribution) {
-    contribution.registerCommands(Tide.commands.registry);
+    contribution.registerCommands(Tide.commandService.registry);
   }
 
-  /// Initialize the Tide instance, and register the built-in services.
-  void initialize({
+  /// Identify the built-in services to be used.
+  /// This can be called anytime but normally is called before any services are used or UI is built.
+  void useServices({
     /// A list of built-in services to be started.
     List<TideId> services = const [],
   }) {
     _instantiateOptionalServices(services);
   }
 
-  void addExtension() {}
+  /// Initialize the Tide instance
+  void initialize() {}
+
+  void addExtension(TideExtension extension) {
+    extension.activate(this);
+  }
 
   void _registerOptionalServices() {
     // Add each optional service to the registry.
@@ -449,11 +396,21 @@ class Tide {
         () => get.registerSingleton<TideTimeService>(TideTimeService());
   }
 
+  final List<TideId> _servicesUsed = [];
+
   void _instantiateOptionalServices(List<TideId> services) {
     for (final serviceId in services) {
+      if (_servicesUsed.contains(serviceId)) {
+        continue;
+      }
       final createHandler = _servicesAvailable[serviceId.id];
       if (createHandler != null) {
-        createHandler();
+        try {
+          createHandler();
+          _servicesUsed.add(serviceId);
+        } catch (e) {
+          log('Exception while creating service: $e');
+        }
       }
     }
   }
@@ -472,4 +429,26 @@ class TideServiceIds {
 class TideIds {
   final command = TideCommandIds();
   final service = TideServiceIds();
+}
+
+/// An extension is a class that registers various commands, actions,
+/// contributions, and widgets to build a cohesive feature.
+abstract class TideExtension {
+  /// An identifier for the extension such as: "com.example.hello.world", that can be referenced by other extensions.
+  TideId get id;
+
+  /// A unique identifier for the extension which must be globally unique.
+  String get uuid;
+
+  /// The name of the extension.
+  String get name;
+
+  /// The description of the extension.
+  String get description => '';
+
+  /// Setup this extension within the Tide instance.
+  void activate(Tide tide) {}
+
+  /// Deactivate this extension.
+  void deactivate() {}
 }

@@ -60,9 +60,3 @@ class MenuContribution {
 // Register Icons
 // const menubarIcon = registerIcon('menuBar', Codicon.layoutMenubar,
 //     localize('menuBarIcon', "Represents the menu bar"));
-
-// final _hwC =
-//     GlobalRegistry.bind(TideCommandContribution, HelloworldCommandContribution);
-// final _hwA = GlobalRegistry.bind(
-//     TideActivityContribution, HelloworldActivityContribution);
-

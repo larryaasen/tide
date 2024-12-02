@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// A widget that displays a calendar day pane.
 class TideCalendarDayPane extends StatelessWidget {
   const TideCalendarDayPane({super.key});
 
