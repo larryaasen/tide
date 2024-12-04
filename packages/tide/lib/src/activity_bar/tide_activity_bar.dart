@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 import '../commands/tide_command.dart';
@@ -93,7 +94,7 @@ enum TideActivityBarItemPosition {
   end,
 }
 
-class TideActivityBarItem {
+class TideActivityBarItem extends Equatable {
   TideActivityBarItem({
     final TideId? itemId,
     required this.title,
@@ -111,4 +112,8 @@ class TideActivityBarItem {
   final TideId? commandId;
   final TideCommandParams commandParams;
   final TideActivityBarItemPosition position;
+
+  @override
+  List<Object?> get props =>
+      [itemId, title, icon, commandId, commandParams, position];
 }

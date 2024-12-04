@@ -47,18 +47,42 @@ class TideActivityBarState extends Equatable {
 }
 
 class TideStatusBarState extends Equatable {
-  const TideStatusBarState({this.isVisible = true});
+  const TideStatusBarState({this.isVisible = true, this.items = const []});
 
   final bool isVisible;
+  final List<TideStatusBarItem> items;
 
   @override
-  List<Object?> get props => [isVisible];
+  List<Object?> get props => [isVisible, items];
+
+  TideStatusBarItem? getItem(TideId itemId) {
+    if (itemId.id.isEmpty && items.length == 1) {
+      return items[0];
+    }
+    for (final item in items) {
+      if (item.itemId == itemId) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  int getItemIndex(TideId? itemId) {
+    for (int i = 0; i < items.length; i++) {
+      if (items[i].itemId.id == itemId?.id) {
+        return i;
+      }
+    }
+    return -1;
+  }
 
   TideStatusBarState copyWith({
     bool? isVisible,
+    List<TideStatusBarItem>? items,
   }) {
     return TideStatusBarState(
       isVisible: isVisible ?? this.isVisible,
+      items: items ?? this.items,
     );
   }
 }
@@ -186,9 +210,8 @@ extension TideWorkbenchLayoutServiceActivityBar on TideWorkbenchLayoutService {
   /// Set the activity bar visibility.
   void setActivtyBarVisible(bool visible) {
     final currentState = state.value;
-    final newActivityBar =
-        currentState.activityBar.copyWith(isVisible: visible);
-    updateState(currentState.copyWith(activityBar: newActivityBar));
+    final newBar = currentState.activityBar.copyWith(isVisible: visible);
+    updateState(currentState.copyWith(activityBar: newBar));
   }
 
   void addActivityBarItem(TideActivityBarItem newItem) {
@@ -200,8 +223,8 @@ extension TideWorkbenchLayoutServiceActivityBar on TideWorkbenchLayoutService {
     final newList =
         List<TideActivityBarItem>.from(currentState.activityBar.items)
           ..add(newItem);
-    final newActivityBar = currentState.activityBar.copyWith(items: newList);
-    updateState(currentState.copyWith(activityBar: newActivityBar));
+    final newBar = currentState.activityBar.copyWith(items: newList);
+    updateState(currentState.copyWith(activityBar: newBar));
   }
 
   void addActivityBarItems(List<TideActivityBarItem> items) {
@@ -220,5 +243,23 @@ extension TideWorkbenchLayoutServiceStatusBar on TideWorkbenchLayoutService {
     final currentState = state.value;
     final newStatusBar = currentState.statusBar.copyWith(isVisible: visible);
     updateState(currentState.copyWith(statusBar: newStatusBar));
+  }
+
+  void addStatusBarItem(TideStatusBarItem newItem) {
+    final currentState = state.value;
+    if (currentState.statusBar.getItem(newItem.itemId) != null) {
+      throw ArgumentError(
+          'Tide: TideWorkbenchLayoutService.addStatusBarItem itemId already exists');
+    }
+    final newList = List<TideStatusBarItem>.from(currentState.statusBar.items)
+      ..add(newItem);
+    final newBar = currentState.statusBar.copyWith(items: newList);
+    updateState(currentState.copyWith(statusBar: newBar));
+  }
+
+  void addStatusBarItems(List<TideStatusBarItem> items) {
+    for (final item in items) {
+      addStatusBarItem(item);
+    }
   }
 }

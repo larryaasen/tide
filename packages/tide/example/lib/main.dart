@@ -6,21 +6,25 @@ import 'package:tide/tide.dart';
 
 /// Example 1: status bar with no panels.
 void main1() {
+  final _ = Tide();
   runApp(const TideApp());
 }
 
 /// Example 2: status bar with no panels.
 void main2() {
+  final _ = Tide();
   runApp(TideApp(home: TideWindow()));
 }
 
 /// Example 3: status bar with no panels.
 void main3() {
+  final _ = Tide();
   runApp(TideApp(home: TideWindow(workbench: TideWorkbench())));
 }
 
 /// Example 4: status bar with no panels.
 void main4() {
+  final _ = Tide();
   runApp(
     TideApp(
       home: TideWindow(
@@ -34,6 +38,7 @@ void main4() {
 
 /// Example 5: left panel.
 void main5() {
+  final _ = Tide();
   final workbenchService = Tide.get<TideWorkbenchService>();
   workbenchService.layoutService.addPanel(const TidePanel());
 
@@ -57,6 +62,7 @@ void main5() {
 
 /// Example 6: left and right panels.
 void main6() {
+  final _ = Tide();
   final leftPanelId = TideId.uniqueId();
   final rightPanelId = TideId.uniqueId();
   final workbenchService = Tide.get<TideWorkbenchService>();
@@ -94,6 +100,7 @@ void main6() {
 
 /// Example 7: left and center panels, and status bar.
 void main7() {
+  final _ = Tide();
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();
   final workbenchService = Tide.get<TideWorkbenchService>();
@@ -141,6 +148,7 @@ void main7() {
 
 /// Example 8: left, middle, right, top, bottom panels, and status bar.
 void main8() {
+  final _ = Tide();
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();
   final rightPanelId = TideId.uniqueId();
@@ -208,6 +216,7 @@ void main8() {
 
 /// Example 9: bottom panel containing a console widget, logging service, and status bar.
 void main9() {
+  final _ = Tide();
   final logging = TideLoggingService();
   int messageIndex = 1;
 
@@ -288,7 +297,7 @@ void main11() {
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          activityBarBuilder: (context, barId) => const TideActivityBar(),
+          activityBar: const TideActivityBar(),
           statusBar: const TideStatusBar(
             items: [
               TideStatusBarItemTime(position: TideStatusBarItemPosition.right)
@@ -324,7 +333,7 @@ void main12() {
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          activityBarBuilder: (context, barId) => const TideActivityBar(),
+          activityBar: const TideActivityBar(),
           panelBuilder: (context, panel) {
             return TidePanelWidget(
               panelId: panel.panelId,
@@ -370,7 +379,7 @@ void main13() {
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          activityBarBuilder: (context, barId) => const TideActivityBar(),
+          activityBar: const TideActivityBar(),
           panelBuilder: (context, panel) {
             return TidePanelWidget(
               panelId: panel.panelId,
@@ -423,7 +432,7 @@ void main14() {
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          activityBarBuilder: (context, barId) => const TideActivityBar(),
+          activityBar: const TideActivityBar(),
           panelBuilder: (context, panel) {
             return TidePanelWidget(
               panelId: panel.panelId,
@@ -482,7 +491,7 @@ void main15() {
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          activityBarBuilder: (context, barId) => const TideActivityBar(),
+          activityBar: const TideActivityBar(),
           panelBuilder: (context, panel) {
             if (panel.panelId.id == leftPanelId.id) {
               return TidePanelWidget(
@@ -522,22 +531,15 @@ void main15() {
 
 /// Example 16: add extension with keybinding and time services, and keybinding to toggle the
 /// status bar visibility.
-void main() {
+void main16() {
   final tide = Tide();
-  tide.addExtension(MyTideExtension());
+  tide.addExtension(MyCalendarExtension());
 
   runApp(
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          activityBarBuilder: (context, barId) => const TideActivityBar(),
-          statusBar: const TideStatusBar(
-            items: [
-              TideStatusBarItemTime(
-                  position: TideStatusBarItemPosition.left,
-                  use24HourFormat: true)
-            ],
-          ),
+          activityBar: const TideActivityBar(),
         ),
       ),
     ),
@@ -546,14 +548,20 @@ void main() {
 
 /// A Tide extension that uses the keybinding and time services, and adds a keybinding to toggle the
 /// status bar visibility.
-class MyTideExtension extends TideExtension {
-  MyTideExtension();
+class MyCalendarExtension extends TideExtension {
+  MyCalendarExtension();
 
-  /// The panel ID where the calendar day pane is displayed.
-  final panelId = const TideId('my.panel.leftPanel');
+  @override
+  TideId get id => const TideId('my.tide.extension');
+
+  @override
+  String get uuid => '37e4381c-e6e3-4ba2-8dda-2f50033e53a7';
 
   @override
   String get name => 'My Tide Extension';
+
+  /// The panel ID where the calendar day pane is displayed.
+  final panelId = const TideId('my.panel.leftPanel');
 
   @override
   void activate(Tide tide) {
@@ -588,6 +596,7 @@ class MyTideExtension extends TideExtension {
         return null;
       },
     ));
+
     tide.workbenchService.layoutService.addActivityBarItems([
       TideActivityBarItem(
         title: 'Calendar Day',
@@ -595,6 +604,15 @@ class MyTideExtension extends TideExtension {
         commandId: togglePanelVisibility,
       ),
     ]);
+
+    tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItem(
+      itemBuilder: (context, item) {
+        return const TideStatusBarItemTime(
+          position: TideStatusBarItemPosition.left,
+          use24HourFormat: true,
+        );
+      },
+    ));
 
     final bindings = Tide.get<TideKeybindingService>();
     bindings.addBinding(
@@ -604,10 +622,72 @@ class MyTideExtension extends TideExtension {
           commandId: Tide.ids.command.toggleStatusBarVisibility),
     );
   }
+}
 
-  @override
-  TideId get id => const TideId('my.tide.extension');
+/// Example 17: A macOS looking left side panel without a status bar.
+void main() {
+  final _ = Tide();
+  final leftPanelId = TideId.uniqueId();
+  final mainPanelId = TideId.uniqueId();
+  final workbenchService = Tide.get<TideWorkbenchService>();
+  workbenchService.layoutService.addPanel(TidePanel(panelId: leftPanelId));
+  workbenchService.layoutService.addPanel(TidePanel(panelId: mainPanelId));
 
-  @override
-  String get uuid => '37e4381c-e6e3-4ba2-8dda-2f50033e53a7';
+  runApp(
+    TideApp(
+      home: TideWindow(
+        workbench: TideWorkbench(
+          panelBuilder: (context, panel) {
+            if (panel.panelId.id == leftPanelId.id) {
+              return const TidePanelWidget(
+                backgroundColor: Color(0xFFE0E0DF),
+                position: TidePosition.left,
+                resizeSide: TidePosition.right,
+                minWidth: 180.0,
+                child: Column(
+                  children: [
+                    Spacer(),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(width: 16.0),
+                        Icon(Icons.account_circle,
+                            color: Colors.grey, size: 20.0),
+                        SizedBox(width: 8.0),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('John Appleseed',
+                                style: TextStyle(
+                                    fontSize: 13.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF20201F))),
+                            Text('john@apple.com',
+                                style: TextStyle(
+                                    fontSize: 11.0, color: Colors.grey))
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12.0),
+                  ],
+                ),
+              );
+            } else if (panel.panelId.id == mainPanelId.id) {
+              return const TidePanelWidget(
+                backgroundColor: Color(0xFFECECEB),
+                expanded: true,
+                position: TidePosition.center,
+                child: Center(
+                    child: Text('Main Panel',
+                        style: TextStyle(color: Color(0xFF20201F)))),
+              );
+            }
+            return null;
+          },
+          statusBar: null,
+        ),
+      ),
+    ),
+  );
 }

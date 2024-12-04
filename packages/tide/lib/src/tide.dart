@@ -8,6 +8,7 @@ import 'commands/tide_contributions.dart';
 import 'services/tide_command_service.dart';
 import 'services/tide_keybinding_service.dart';
 import 'services/tide_time_service.dart';
+import 'services/tide_workbench_layout_service.dart';
 import 'services/tide_workbench_service.dart';
 import 'tide_core.dart';
 import 'widgets/tide_panel_widget.dart';
@@ -30,14 +31,46 @@ import 'widgets/tide_workbench.dart';
 
 */
 
+typedef TideStatusBarItemBuilder = TideStatusBarItemWidget? Function(
+    BuildContext context, TideStatusBarItem item);
+
+class TideStatusBarItem extends Equatable {
+  TideStatusBarItem({
+    final TideId? itemId,
+    this.isVisible = true,
+    this.itemBuilder,
+  }) {
+    this.itemId = itemId ?? TideId.uniqueId();
+  }
+
+  late final TideId itemId;
+  final bool isVisible;
+  final TideStatusBarItemBuilder? itemBuilder;
+
+  @override
+  List<Object?> get props => [itemId, isVisible, itemBuilder];
+
+  copyWith({
+    TideId? itemId,
+    bool? isVisible,
+    TideStatusBarItemBuilder? itemBuilder,
+  }) {
+    return TideStatusBarItem(
+      itemId: itemId ?? this.itemId,
+      isVisible: isVisible ?? this.isVisible,
+      itemBuilder: itemBuilder ?? this.itemBuilder,
+    );
+  }
+}
+
 enum TideStatusBarItemPosition {
   left,
   center,
   right,
 }
 
-abstract class TideStatusBarItem extends StatelessWidget {
-  const TideStatusBarItem({
+abstract class TideStatusBarItemWidget extends StatelessWidget {
+  const TideStatusBarItemWidget({
     super.key,
     this.position = TideStatusBarItemPosition.center,
   });
@@ -61,7 +94,7 @@ abstract class TideStatusBarItem extends StatelessWidget {
   }
 }
 
-class TideStatusBarItemText extends TideStatusBarItem {
+class TideStatusBarItemText extends TideStatusBarItemWidget {
   const TideStatusBarItemText(
       {super.key,
       super.position = TideStatusBarItemPosition.center,
@@ -79,7 +112,7 @@ class TideStatusBarItemText extends TideStatusBarItem {
 /// final tide = Tide();
 /// tide.initialize(services: [Tide.ids.service.time]);');
 /// ```
-class TideStatusBarItemTime extends TideStatusBarItem {
+class TideStatusBarItemTime extends TideStatusBarItemWidget {
   const TideStatusBarItemTime(
       {super.key, super.position, this.use24HourFormat = false});
 
@@ -118,17 +151,30 @@ class TideStatusBar extends StatelessWidget {
       this.items = const []});
 
   final Color backgroundColor;
-  final List<TideStatusBarItem> items;
+  final List<TideStatusBarItemWidget> items;
 
   @override
   Widget build(BuildContext context) {
-    final leftSide = items
+    final workbenchService = Tide.get<TideWorkbenchService>();
+    final currentState =
+        workbenchService.accessor.get<TideWorkbenchLayoutService>().state;
+
+    final itemWidgets = currentState.value.statusBar.items.map((item) {
+      return item.itemBuilder != null
+          ? item.itemBuilder!(context, item) ??
+              const TideStatusBarItemText(text: '')
+          : const TideStatusBarItemText(text: '');
+    }).toList();
+
+    final barItems = [...items, ...itemWidgets];
+
+    final leftSide = barItems
         .where((panel) => panel.position == TideStatusBarItemPosition.left)
         .toList();
-    final center = items
+    final center = barItems
         .where((panel) => panel.position == TideStatusBarItemPosition.center)
         .toList();
-    final rightSide = items
+    final rightSide = barItems
         .where((panel) => panel.position == TideStatusBarItemPosition.right)
         .toList();
     final centerWidgets = center.isEmpty
@@ -158,13 +204,13 @@ class TidePanel extends Equatable {
   const TidePanel({
     this.panelId = TideId.empty,
     this.isVisible = true,
-    this.initialWidth = 200.0,
+    // this.initialWidth = 200.0,
     this.panelBuilder,
   });
 
   final TideId panelId;
   final bool isVisible;
-  final double initialWidth;
+  // final double initialWidth;
   final TidePanelBuilder? panelBuilder;
 
   // final Color backgroundColor;
@@ -174,18 +220,23 @@ class TidePanel extends Equatable {
   // final TidePosition? resizeSide;
 
   @override
-  List<Object?> get props => [panelId, isVisible, initialWidth, panelBuilder];
+  List<Object?> get props => [
+        panelId,
+        isVisible,
+        // initialWidth,
+        panelBuilder,
+      ];
 
   TidePanel copyWith({
     TideId? panelId,
     bool? isVisible,
-    double? initialWidth,
+    // double? initialWidth,
     TidePanelBuilder? panelBuilder,
   }) {
     return TidePanel(
       panelId: panelId ?? this.panelId,
       isVisible: isVisible ?? this.isVisible,
-      initialWidth: initialWidth ?? this.initialWidth,
+      // initialWidth: initialWidth ?? this.initialWidth,
       panelBuilder: panelBuilder ?? this.panelBuilder,
     );
   }

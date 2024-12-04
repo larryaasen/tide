@@ -13,6 +13,7 @@ class TideResizer extends StatefulWidget {
     this.maxHeight = 3000,
     this.initialHeight = 200,
     this.resizeSide = TidePosition.right,
+    this.showResizeBorder = true,
     required this.child,
   }) : assert(resizeSide != TidePosition.center);
 
@@ -23,6 +24,7 @@ class TideResizer extends StatefulWidget {
   final double maxHeight;
   final double initialHeight;
   final TidePosition resizeSide;
+  final bool showResizeBorder;
   final Widget child;
 
   @override
@@ -52,6 +54,18 @@ class _TideResizerState extends State<TideResizer> {
         ? Container(height: resizerDimension, color: Colors.transparent)
         : Container(width: resizerDimension, color: Colors.transparent);
 
+    const lineDimension = 1.0;
+    final line = !widget.showResizeBorder
+        ? null
+        : isHorizontalSeparator
+            ? Container(height: lineDimension, color: const Color(0xFFC5C5C4))
+            : Container(width: lineDimension, color: const Color(0xFFC5C5C4));
+    final content = line == null
+        ? widget.child
+        : Row(
+            children: [Expanded(child: widget.child), line],
+          );
+
     return SizedBox(
       width: !isHorizontalSeparator ? _currentWidth : null,
       height: isHorizontalSeparator ? _currentHeight : null,
@@ -60,7 +74,7 @@ class _TideResizerState extends State<TideResizer> {
           SizedBox(
               width: isHorizontalSeparator ? null : _currentWidth,
               height: isHorizontalSeparator ? _currentHeight : null,
-              child: widget.child),
+              child: content),
           Positioned(
             left: widget.resizeSide == TidePosition.right ? null : 0,
             right: widget.resizeSide == TidePosition.left ? null : 0,

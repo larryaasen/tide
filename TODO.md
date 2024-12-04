@@ -2,6 +2,10 @@
 
 - Move classes to individual files.
 
+## Actions
+
+- Finish implementing Actions.
+
 ## Activity Bar
 
 - Add support for multiple activity bars.

@@ -9,8 +9,6 @@ import '../tide.dart';
 import '../tide_core.dart';
 import 'tide_panel_widget.dart';
 
-typedef TideActivityBarBuilder = TideActivityBar? Function(
-    BuildContext context, TideId barId);
 typedef TidePanelBuilder = TidePanelWidget? Function(
     BuildContext context, TidePanel panel);
 
@@ -18,8 +16,8 @@ typedef TidePanelBuilder = TidePanelWidget? Function(
 class TideWorkbench extends StatelessWidget {
   TideWorkbench({
     super.key,
-    this.activityBarBuilder,
     this.panelBuilder,
+    this.activityBar,
     this.statusBar = const TideStatusBar(),
     this.backgroudColor = Colors.white,
   }) {
@@ -30,8 +28,8 @@ class TideWorkbench extends StatelessWidget {
     }
   }
 
-  final TideActivityBarBuilder? activityBarBuilder;
   final TidePanelBuilder? panelBuilder;
+  final TideActivityBar? activityBar;
   final TideStatusBar? statusBar;
   final Color backgroudColor;
 
@@ -53,8 +51,8 @@ class TideWorkbench extends StatelessWidget {
 
     // Get the activity bar widget
     TideActivityBar? activityBarWidget;
-    if (activityBarBuilder != null && state.activityBar.isVisible) {
-      activityBarWidget = activityBarBuilder!(context, TideId.empty);
+    if (activityBar != null && state.activityBar.isVisible) {
+      activityBarWidget = activityBar;
     }
 
     final panels = state.panels;
