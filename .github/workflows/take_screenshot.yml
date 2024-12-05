@@ -24,10 +24,11 @@ jobs:
       - name: Run PowerShell script to take screenshot
         run: |
           pwd;
-          ls -al;
-          git-bash.exe -c "pwd";
-          git-bash.exe -c "ls -al";
-          git-bash.exe -c "ls -al scripts";
+          ls;
+          ls scripts;
+          # git-bash.exe -c "pwd";
+          # git-bash.exe -c "ls -al";
+          # git-bash.exe -c "ls -al scripts";
           powershell.exe -File scripts/take_screenshot_windows.ps1;
 
       - name: Upload screenshot
