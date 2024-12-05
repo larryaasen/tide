@@ -21,12 +21,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run PowerShell script to take screenshot1
+      - name: LS
         run: bash.exe -c "pwd; ls -al; ls -al scripts;"
 
       - name: Run PowerShell script to take screenshot2
         run: |
           powershell.exe -File scripts/take_screenshot_windows.ps1
+
+      - name: LS
+        run: bash.exe "ls -al"
 
       - name: Upload screenshot
         uses: actions/upload-artifact@v4
