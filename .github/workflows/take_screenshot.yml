@@ -25,7 +25,7 @@ jobs:
         run: powershell.exe -Command "Get-Location"
 
       - name: Run PowerShell script to take screenshot1
-        run: "C:\\Program Files\\Git\\bin\\bash.exe -c 'pwd; ls -al; ls -al scripts;'"
+        run: bash.exe -c "pwd; ls -al; ls -al scripts;"
 
       - name: Run PowerShell script to take screenshot2
         run: |
