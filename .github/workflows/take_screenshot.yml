@@ -21,7 +21,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run PowerShell script to take screenshot
+      - name: Print current working directory
+        run: powershell.exe -Command "Get-Location"
+
+      - name: Run PowerShell script to take screenshot1
+        run: "C:\\Program Files\\Git\\bin\\bash.exe -c 'pwd; ls -al; ls -al scripts;'"
+
+      - name: Run PowerShell script to take screenshot2
         run: |
           cmd.exe /c ""C:\Program Files\Git\bin\bash.exe" -c 'pwd; ls -al; ls -al scripts;'"
           bash.exe /c "pwd; ls -al; ls -al scripts;"
