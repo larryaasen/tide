@@ -21,21 +21,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Print current working directory
-        run: powershell.exe -Command "Get-Location"
-
       - name: Run PowerShell script to take screenshot1
         run: bash.exe -c "pwd; ls -al; ls -al scripts;"
 
       - name: Run PowerShell script to take screenshot2
         run: |
-          cmd.exe /c ""C:\Program Files\Git\bin\bash.exe" -c 'pwd; ls -al; ls -al scripts;'"
-          bash.exe /c "pwd; ls -al; ls -al scripts;"
-          # "C:\Program Files\Git\bin\bash.exe" -c "pwd; ls -al; ls -al scripts;"
-          # git-bash.exe -c "pwd";
-          # git-bash.exe -c "ls -al";
-          # git-bash.exe -c "ls -al scripts";
-          powershell.exe -File scripts/take_screenshot_windows.ps1;
+          powershell.exe -File scripts/take_screenshot_windows.ps1
 
       - name: Upload screenshot
         uses: actions/upload-artifact@v4
