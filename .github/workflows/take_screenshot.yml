@@ -23,7 +23,7 @@ jobs:
 
       - name: Run PowerShell script to take screenshot
         run: |
-          C:\Program Files\Git\bin\bash.exe -c "pwd; ls -al; ls -al scripts;"
+          "C:\Program Files\Git\bin\bash.exe" -c "pwd; ls -al; ls -al scripts;"
           # git-bash.exe -c "pwd";
           # git-bash.exe -c "ls -al";
           # git-bash.exe -c "ls -al scripts";
