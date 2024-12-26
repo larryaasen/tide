@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../activity_bar/tide_activity_bar.dart';
-import '../services/tide_keybinding_service.dart';
+import '../notifications/tide_notification_center.dart';
+import '../notifications/tide_notifications.dart';
 import '../services/tide_workbench_layout_service.dart';
 import '../services/tide_workbench_service.dart';
+import '../status_bar/tide_status_bar.dart';
 import '../tide.dart';
 import '../tide_core.dart';
 import 'tide_panel_widget.dart';
@@ -47,8 +49,6 @@ class TideWorkbench extends StatelessWidget {
   }
 
   Widget _buildInternal(BuildContext context, TideWorkbenchLayoutState state) {
-    final accessor = workbenchService.accessor;
-
     // Get the activity bar widget
     TideActivityBar? activityBarWidget;
     if (activityBar != null && state.activityBar.isVisible) {
@@ -105,9 +105,7 @@ class TideWorkbench extends StatelessWidget {
       ],
     );
 
-    final statusBarVisible = state.statusBar.isVisible;
-
-    final outer = Column(
+    final main = Column(
       children: [
         Expanded(
           child: Row(
@@ -117,7 +115,32 @@ class TideWorkbench extends StatelessWidget {
             ],
           ),
         ),
-        if (statusBar != null && statusBarVisible) statusBar!,
+      ],
+    );
+
+    final statusBarBuilder = statusBar != null
+        ? ValueListenableBuilder<TideStatusBarState>(
+            valueListenable: workbenchService.accessor
+                .get<TideWorkbenchLayoutService>()
+                .statusBarState,
+            builder: (context, statusBarState, child) {
+              if (statusBarState.isVisible) {
+                return statusBar!;
+              }
+              return const SizedBox.shrink();
+            })
+        : null;
+
+    final notificationService = Tide.get<TideNotificationService>();
+
+    final outer = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Expanded(
+          child: NotificationsCenter(
+              notificationService: notificationService, child: main),
+        ),
+        if (statusBarBuilder != null) statusBarBuilder,
       ],
     );
 
@@ -129,11 +152,6 @@ class TideWorkbench extends StatelessWidget {
       accessor: workbenchService.accessor,
       child: content,
     );
-
-    // Wrap the content with TideKeyboardListener
-    content = Tide.get.isRegistered<TideKeybindingService>() == true
-        ? TideKeyboardListener(accessor: accessor, child: content)
-        : content;
 
     // Wrap the content with SafeArea
     content = SafeArea(child: content);

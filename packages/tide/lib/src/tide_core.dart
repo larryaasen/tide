@@ -26,6 +26,8 @@ class TideId extends Equatable {
     return TideId(uniqueId);
   }
 
+  static String get uuid => _uuid.v4();
+
   static const TideId empty = TideId('');
 }
 

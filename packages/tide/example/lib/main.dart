@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -133,7 +134,7 @@ void main7() {
             }
             return null;
           },
-          statusBar: const TideStatusBar(items: [
+          statusBar: TideStatusBar(items: [
             TideStatusBarItemText(
                 text: 'Status Bar1', position: TideStatusBarItemPosition.left),
             TideStatusBarItemText(text: 'Status Bar2'),
@@ -260,7 +261,7 @@ void main10() {
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          statusBar: const TideStatusBar(
+          statusBar: TideStatusBar(
             items: [
               TideStatusBarItemText(
                   text: 'Inputs: 2', position: TideStatusBarItemPosition.left),
@@ -298,7 +299,7 @@ void main11() {
       home: TideWindow(
         workbench: TideWorkbench(
           activityBar: const TideActivityBar(),
-          statusBar: const TideStatusBar(
+          statusBar: TideStatusBar(
             items: [
               TideStatusBarItemTime(position: TideStatusBarItemPosition.right)
             ],
@@ -343,7 +344,7 @@ void main12() {
               child: const Center(child: Text('Right Panel')),
             );
           },
-          statusBar: const TideStatusBar(
+          statusBar: TideStatusBar(
             items: [
               TideStatusBarItemTime(position: TideStatusBarItemPosition.right)
             ],
@@ -518,7 +519,7 @@ void main15() {
             }
             return null;
           },
-          statusBar: const TideStatusBar(
+          statusBar: TideStatusBar(
             items: [
               TideStatusBarItemTime(position: TideStatusBarItemPosition.right)
             ],
@@ -605,13 +606,9 @@ class MyCalendarExtension extends TideExtension {
       ),
     ]);
 
-    tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItem(
-      itemBuilder: (context, item) {
-        return const TideStatusBarItemTime(
-          position: TideStatusBarItemPosition.left,
-          use24HourFormat: true,
-        );
-      },
+    tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItemTime(
+      position: TideStatusBarItemPosition.left,
+      use24HourFormat: true,
     ));
 
     final bindings = Tide.get<TideKeybindingService>();
@@ -625,7 +622,7 @@ class MyCalendarExtension extends TideExtension {
 }
 
 /// Example 17: A macOS looking left side panel without a status bar.
-void main() {
+void main17() {
   final _ = Tide();
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();
@@ -688,6 +685,195 @@ void main() {
           statusBar: null,
         ),
       ),
+    ),
+  );
+}
+
+/// Example 18: status bar with no panels.
+void main() {
+  Platform;
+  final tide = Tide();
+
+  tide.useServices(services: [
+    Tide.ids.service.notifications,
+    Tide.ids.service.time,
+  ]);
+
+  final leftPanelId = TideId.uniqueId();
+  final mainPanelId = TideId.uniqueId();
+
+  final workbenchService = Tide.get<TideWorkbenchService>();
+  workbenchService.layoutService.addPanels([
+    TidePanel(panelId: leftPanelId),
+    TidePanel(panelId: mainPanelId),
+  ]);
+  workbenchService.layoutService.addActivityBarItems([
+    TideActivityBarItem(
+      title: 'Calendar Day',
+      icon: Icons.calendar_month,
+    ),
+  ]);
+
+  final tideOS = TideOS();
+
+  final statusBarColor = ValueNotifier<Color?>(null);
+
+  TideNotification? timeNotification;
+
+  // An example of using a child status bar item that is clickable and changes the status bar color.
+  tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItem(
+    position: TideStatusBarItemPosition.left,
+    builder: (context, item) {
+      return TideStatusBarItemContainer(
+        item: item,
+        onPressed: (TideStatusBarItem item) {
+          statusBarColor.value =
+              statusBarColor.value == null ? Colors.red : null;
+        },
+        tooltip: 'Click to toggle the status bar color',
+        child: const Row(
+          children: [
+            Icon(Icons.sync, size: 16.0, color: Colors.white),
+            SizedBox(width: 4.0),
+            Text('Toggle status bar color',
+                style: TideStatusBarItemTextWidget.style),
+          ],
+        ),
+      );
+    },
+  ));
+
+  num progressWorked = 0;
+  final progressItem = TideStatusBarItemProgress(
+    position: TideStatusBarItemPosition.center,
+    infinite: false,
+    progressTotal: 10.0,
+    progressWorked: progressWorked,
+    onPressedClose: (TideStatusBarItem item) {
+      if (item is TideStatusBarItemProgress) {
+        final newItem = item.copyWith(infinite: true);
+        tide.workbenchService.layoutService.replaceStatusBarItem(newItem);
+      }
+    },
+    tooltip: 'Click to restart the progress bar',
+  );
+  tide.workbenchService.layoutService.addStatusBarItem(progressItem);
+
+  Timer.periodic(const Duration(milliseconds: 250), (timer) {
+    final item = tide.workbenchService.layoutService.statusBarState.value
+        .getItem(progressItem.itemId);
+    if (item is TideStatusBarItemProgress) {
+      if (!item.infinite) {
+        progressWorked = progressWorked == 10 ? 0 : progressWorked + 1;
+        final newItem = item.copyWith(progressWorked: progressWorked);
+        tide.workbenchService.layoutService.replaceStatusBarItem(newItem);
+      }
+    }
+  });
+
+  // An example of using an icon in the status bar.
+  tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItem(
+    position: TideStatusBarItemPosition.right,
+    builder: (context, item) {
+      return TideStatusBarItemContainer(
+        item: item,
+        tooltip: 'Account',
+        child:
+            const Icon(Icons.account_circle, size: 16.0, color: Colors.white),
+      );
+    },
+  ));
+
+  // An example of using a text status bar item that is clickable and shows notifications.
+  tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItemText(
+    position: TideStatusBarItemPosition.right,
+    onPressed: (TideStatusBarItem item) {
+      final notificationService = Tide.get<TideNotificationService>();
+      final notification = TideNotification(
+          message: 'Flutter: Hot reloading...',
+          severity: TideNotificationSeverity.info,
+          autoTimeout: true,
+          progressInfinite: true);
+      notificationService.notify(notification);
+      final msg2 =
+          '${tideOS.currentTypeFormatted} ${tideOS.operatingSystemVersion}';
+      notificationService.warning(msg2, autoTimeout: true);
+      final msg1 =
+          '${tideOS.currentTypeFormatted} ${tideOS.operatingSystemVersion}'
+          ' This is a very long message to test out lots of wrapping across this notification.';
+      notificationService.error(msg1, autoTimeout: true);
+      final msg =
+          '${tideOS.currentTypeFormatted} ${tideOS.operatingSystemVersion}';
+      notificationService.info(msg, autoTimeout: true, allowClose: false);
+    },
+    text: tideOS.currentTypeFormatted,
+    tooltip: 'OS Type',
+  ));
+
+  // An example of using a time status bar item.
+  tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItemTime(
+    position: TideStatusBarItemPosition.right,
+    tooltip: 'The current time',
+    onPressed: (TideStatusBarItem item) {
+      final notificationService = Tide.get<TideNotificationService>();
+      if (timeNotification == null ||
+          !notificationService.notificationExists(timeNotification!.id)) {
+        final timeService = Tide.get<TideTimeService>();
+        final msg =
+            'The time is: ${timeService.currentTimeState.timeFormatted()}';
+        timeNotification =
+            notificationService.info(msg, autoTimeout: true, allowClose: false);
+      }
+    },
+  ));
+
+  // An example of using an icon in the status bar.
+  tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItem(
+    position: TideStatusBarItemPosition.right,
+    builder: (context, item) {
+      return TideStatusBarItemContainer(
+        item: item,
+        tooltip: 'Notifications',
+        child: const Icon(Icons.notifications_none_outlined,
+            size: 16.0, color: Colors.white),
+      );
+    },
+  ));
+
+  runApp(
+    ValueListenableBuilder<Color?>(
+      valueListenable: statusBarColor,
+      builder: (context, colorValue, child) {
+        return TideApp(
+          home: TideWindow(
+            workbench: TideWorkbench(
+                activityBar: const TideActivityBar(),
+                panelBuilder: (context, panel) {
+                  if (panel.panelId.id == leftPanelId.id) {
+                    return TidePanelWidget(
+                      panelId: panel.panelId,
+                      backgroundColor: const Color(0xFFF3F3F3),
+                      position: TidePosition.left,
+                      resizeSide: TidePosition.right,
+                      minWidth: 100,
+                      maxWidth: 450,
+                      initialWidth: 220,
+                      child: const Center(child: Text('Left Panel')),
+                    );
+                  } else if (panel.panelId.id == mainPanelId.id) {
+                    return const TidePanelWidget(
+                      backgroundColor: Colors.white,
+                      expanded: true,
+                      position: TidePosition.center,
+                      child: Center(child: Text('Main Panel')),
+                    );
+                  }
+                  return null;
+                },
+                statusBar: TideStatusBar(backgroundColor: colorValue)),
+          ),
+        );
+      },
     ),
   );
 }

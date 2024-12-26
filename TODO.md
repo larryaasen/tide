@@ -12,11 +12,9 @@
 
 ## Status Bar
 
-- Allow any widget in a status bar item.
-- Create a progress bar item.
-- Create an icon based item.
 - Create another style like Android Studio.
 - Create another style like the macOS Audio MIDI Setup app or Finder.
+- Right click on status bar should reveal hide/show options.
 
 ## Hot Keys
 
@@ -37,6 +35,10 @@
 ## Workbench
 
 - Optimize the layout state by having more than one ValueNotifier.
+
+## Notifications
+
+- Implement the Notifications Center that provides a centralized location for managing and viewing notifications.
 
 ## CI
 

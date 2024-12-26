@@ -1,6 +1,6 @@
 # Tide
 
-A toolkit for building IDE like apps on all platforms using Flutter.
+Tide is a toolkit for building IDE and studio like apps on all platforms using Flutter.
 
 ### "Build apps faster"
 
@@ -41,7 +41,7 @@ Widget: A Flutter widget that is part of the Tide UI.
 
 ## TideStatusBar
 
-Will display a collection of items (TideStatusBarItem) on a small status bar at the bottom of a window (TideWindow).
+Will display a collection of items (TideStatusBarItem) on a small status bar at the bottom of a workbench (TideWorkbench).
 
 ## TidePanel
 

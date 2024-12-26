@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
 import '../activity_bar/tide_activity_bar.dart';
+import '../status_bar/tide_status_bar_item.dart';
 import '../tide.dart';
 import '../tide_core.dart';
 
@@ -91,15 +92,13 @@ class TideWorkbenchLayoutState extends Equatable {
   const TideWorkbenchLayoutState({
     this.activityBar = const TideActivityBarState(),
     this.panels = const [],
-    this.statusBar = const TideStatusBarState(),
   });
 
   final TideActivityBarState activityBar;
   final List<TidePanel> panels;
-  final TideStatusBarState statusBar;
 
   @override
-  List<Object?> get props => [activityBar, panels, statusBar];
+  List<Object?> get props => [activityBar, panels];
 
   TidePanel? getPanel(TideId panelId) {
     if (panelId.id.isEmpty && panels.length == 1) {
@@ -125,12 +124,10 @@ class TideWorkbenchLayoutState extends Equatable {
   TideWorkbenchLayoutState copyWith({
     TideActivityBarState? activityBar,
     List<TidePanel>? panels,
-    TideStatusBarState? statusBar,
   }) {
     return TideWorkbenchLayoutState(
       activityBar: activityBar ?? this.activityBar,
       panels: panels ?? this.panels,
-      statusBar: statusBar ?? this.statusBar,
     );
   }
 }
@@ -140,11 +137,16 @@ class TideWorkbenchLayoutService {
 
   final TideServicesAccessor accessor;
 
-  final state =
-      ValueNotifier<TideWorkbenchLayoutState>(const TideWorkbenchLayoutState());
+  final state = ValueNotifier(const TideWorkbenchLayoutState());
+
+  final statusBarState = ValueNotifier(const TideStatusBarState());
 
   void updateState(TideWorkbenchLayoutState newState) {
     state.value = newState;
+  }
+
+  void updateStatusBarState(TideStatusBarState newState) {
+    statusBarState.value = newState;
   }
 }
 
@@ -236,30 +238,38 @@ extension TideWorkbenchLayoutServiceActivityBar on TideWorkbenchLayoutService {
 
 extension TideWorkbenchLayoutServiceStatusBar on TideWorkbenchLayoutService {
   /// Get the status bar visibility.
-  bool getStatusBarVisible() => state.value.statusBar.isVisible;
+  bool getStatusBarVisible() => statusBarState.value.isVisible;
 
   /// Set the status bar visibility.
   void setStatusBarVisible(bool visible) {
-    final currentState = state.value;
-    final newStatusBar = currentState.statusBar.copyWith(isVisible: visible);
-    updateState(currentState.copyWith(statusBar: newStatusBar));
+    final currentState = statusBarState.value;
+    final newState = currentState.copyWith(isVisible: visible);
+    updateStatusBarState(newState);
   }
 
   void addStatusBarItem(TideStatusBarItem newItem) {
-    final currentState = state.value;
-    if (currentState.statusBar.getItem(newItem.itemId) != null) {
+    final currentState = statusBarState.value;
+    if (currentState.getItem(newItem.itemId) != null) {
       throw ArgumentError(
           'Tide: TideWorkbenchLayoutService.addStatusBarItem itemId already exists');
     }
-    final newList = List<TideStatusBarItem>.from(currentState.statusBar.items)
+    final newList = List<TideStatusBarItem>.from(currentState.items)
       ..add(newItem);
-    final newBar = currentState.statusBar.copyWith(items: newList);
-    updateState(currentState.copyWith(statusBar: newBar));
+    final newState = currentState.copyWith(items: newList);
+    updateStatusBarState(newState);
   }
 
   void addStatusBarItems(List<TideStatusBarItem> items) {
     for (final item in items) {
       addStatusBarItem(item);
     }
+  }
+
+  void replaceStatusBarItem(TideStatusBarItem newItem) {
+    final currentState = statusBarState.value;
+    final index = currentState.getItemIndex(newItem.itemId);
+    final newList = List<TideStatusBarItem>.from(currentState.items)
+      ..[index] = newItem;
+    updateStatusBarState(currentState.copyWith(items: newList));
   }
 }

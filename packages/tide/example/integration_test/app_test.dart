@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+/*
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
@@ -50,3 +51,4 @@ Future<void> _appMain() async {
     ),
   );
 }
+*/

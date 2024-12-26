@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:tide/src/notifications/tide_notifications.dart';
 
 import 'activity_bar/tide_activity_bar.dart';
 import 'commands/tide_command.dart';
@@ -8,10 +9,8 @@ import 'commands/tide_contributions.dart';
 import 'services/tide_command_service.dart';
 import 'services/tide_keybinding_service.dart';
 import 'services/tide_time_service.dart';
-import 'services/tide_workbench_layout_service.dart';
 import 'services/tide_workbench_service.dart';
 import 'tide_core.dart';
-import 'widgets/tide_panel_widget.dart';
 import 'widgets/tide_workbench.dart';
 
 /*
@@ -30,174 +29,6 @@ import 'widgets/tide_workbench.dart';
         - TidePanel
 
 */
-
-typedef TideStatusBarItemBuilder = TideStatusBarItemWidget? Function(
-    BuildContext context, TideStatusBarItem item);
-
-class TideStatusBarItem extends Equatable {
-  TideStatusBarItem({
-    final TideId? itemId,
-    this.isVisible = true,
-    this.itemBuilder,
-  }) {
-    this.itemId = itemId ?? TideId.uniqueId();
-  }
-
-  late final TideId itemId;
-  final bool isVisible;
-  final TideStatusBarItemBuilder? itemBuilder;
-
-  @override
-  List<Object?> get props => [itemId, isVisible, itemBuilder];
-
-  copyWith({
-    TideId? itemId,
-    bool? isVisible,
-    TideStatusBarItemBuilder? itemBuilder,
-  }) {
-    return TideStatusBarItem(
-      itemId: itemId ?? this.itemId,
-      isVisible: isVisible ?? this.isVisible,
-      itemBuilder: itemBuilder ?? this.itemBuilder,
-    );
-  }
-}
-
-enum TideStatusBarItemPosition {
-  left,
-  center,
-  right,
-}
-
-abstract class TideStatusBarItemWidget extends StatelessWidget {
-  const TideStatusBarItemWidget({
-    super.key,
-    this.position = TideStatusBarItemPosition.center,
-  });
-
-  final TideStatusBarItemPosition position;
-
-  @override
-  Widget build(BuildContext context) {
-    throw UnimplementedError();
-  }
-
-  Widget buildBarItem(BuildContext context, String text) {
-    return Padding(
-        padding: const EdgeInsets.only(left: 8.0, right: 8.00),
-        child: Text(text,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12.0,
-              fontFeatures: <FontFeature>[FontFeature.tabularFigures()],
-            )));
-  }
-}
-
-class TideStatusBarItemText extends TideStatusBarItemWidget {
-  const TideStatusBarItemText(
-      {super.key,
-      super.position = TideStatusBarItemPosition.center,
-      required this.text});
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => super.buildBarItem(context, text);
-}
-
-/// A status bar item that displays the current time.
-/// Make sure to initialize the time service like this:
-/// ```dart
-/// final tide = Tide();
-/// tide.initialize(services: [Tide.ids.service.time]);');
-/// ```
-class TideStatusBarItemTime extends TideStatusBarItemWidget {
-  const TideStatusBarItemTime(
-      {super.key, super.position, this.use24HourFormat = false});
-
-  final bool use24HourFormat;
-  @override
-  Widget build(BuildContext context) {
-    TideTimeService? timeService;
-    try {
-      timeService = Tide.get<TideTimeService>();
-    } catch (e) {
-      Tide.log(
-          'The TideTimeService is not registered. Did you forget to initialize the service?\n'
-          'Example:\n'
-          '  final tide = Tide();\n'
-          '  tide.initialize(services: [Tide.ids.service.time]);');
-      throw Exception('TideTimeService is not registered.');
-    }
-    return StreamBuilder<TideDiveTimeState>(
-      stream: timeService.stream,
-      initialData: timeService.currentTimeState,
-      builder: (context, snapshot) {
-        final text = snapshot.hasData
-            ? (snapshot.data as TideDiveTimeState)
-                .timeFormatted(use24HourFormat: use24HourFormat)
-            : '';
-        return TideStatusBarItemText(text: text);
-      },
-    );
-  }
-}
-
-class TideStatusBar extends StatelessWidget {
-  const TideStatusBar(
-      {super.key,
-      this.backgroundColor = const Color(0xFF007ACC),
-      this.items = const []});
-
-  final Color backgroundColor;
-  final List<TideStatusBarItemWidget> items;
-
-  @override
-  Widget build(BuildContext context) {
-    final workbenchService = Tide.get<TideWorkbenchService>();
-    final currentState =
-        workbenchService.accessor.get<TideWorkbenchLayoutService>().state;
-
-    final itemWidgets = currentState.value.statusBar.items.map((item) {
-      return item.itemBuilder != null
-          ? item.itemBuilder!(context, item) ??
-              const TideStatusBarItemText(text: '')
-          : const TideStatusBarItemText(text: '');
-    }).toList();
-
-    final barItems = [...items, ...itemWidgets];
-
-    final leftSide = barItems
-        .where((panel) => panel.position == TideStatusBarItemPosition.left)
-        .toList();
-    final center = barItems
-        .where((panel) => panel.position == TideStatusBarItemPosition.center)
-        .toList();
-    final rightSide = barItems
-        .where((panel) => panel.position == TideStatusBarItemPosition.right)
-        .toList();
-    final centerWidgets = center.isEmpty
-        ? [const Spacer()]
-        : [const Spacer(), ...center, const Spacer()];
-    final panels = [...leftSide, ...centerWidgets, ...rightSide];
-    final allPanels = panels
-        .map((panel) => panel is TidePanelWidget && panel.expanded
-            ? Expanded(child: panel)
-            : panel)
-        .toList();
-
-    return Container(
-      width: double.infinity,
-      height: 22.0,
-      color: backgroundColor,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-        child: Row(children: allPanels),
-      ),
-    );
-  }
-}
 
 /// Data model for a workbench panel.
 class TidePanel extends Equatable {
@@ -393,11 +224,14 @@ class Tide {
     _registerOptionalServices();
   }
 
+  /// Register the standard services such as the command and workbench services.
   void _registerStandardServices() {
+    // Register the command service.
     if (!get.isRegistered<TideCommandService>()) {
       get.registerSingleton(TideCommandService());
     }
 
+    // Register the workbench service.
     if (!get.isRegistered<TideWorkbenchService>()) {
       get.registerSingleton(TideWorkbenchService());
     }
@@ -440,9 +274,15 @@ class Tide {
   void _registerOptionalServices() {
     // Add each optional service to the registry.
 
+    // Register the keybinding service.
     _servicesAvailable[ids.service.keybindings.id] = () =>
         get.registerSingleton<TideKeybindingService>(TideKeybindingService());
 
+    // Register the notification service.
+    _servicesAvailable[ids.service.notifications.id] = () => get
+        .registerSingleton<TideNotificationService>(TideNotificationService());
+
+    // Register the time service.
     _servicesAvailable[ids.service.time.id] =
         () => get.registerSingleton<TideTimeService>(TideTimeService());
   }
@@ -473,8 +313,9 @@ class TideCommandIds {
 }
 
 class TideServiceIds {
-  final time = const TideId('tide.service.time');
   final keybindings = const TideId('tide.service.keybindings');
+  final notifications = const TideId('tide.service.notifications');
+  final time = const TideId('tide.service.time');
 }
 
 class TideIds {
