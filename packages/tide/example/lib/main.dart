@@ -689,7 +689,8 @@ void main17() {
   );
 }
 
-/// Example 18: status bar with no panels.
+/// Example 18: Notifications and time services, status bar with progress bar and other items, notifications,
+/// activity bar, with left panel and main panel.
 void main() {
   Platform;
   final tide = Tide();

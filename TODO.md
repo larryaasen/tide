@@ -14,7 +14,7 @@
 
 - Create another style like Android Studio.
 - Create another style like the macOS Audio MIDI Setup app or Finder.
-- Right click on status bar should reveal hide/show options.
+- Right click on status bar should reveal menu of hide/show options for status bar items.
 
 ## Hot Keys
 
@@ -38,7 +38,7 @@
 
 ## Notifications
 
-- Implement the Notifications Center that provides a centralized location for managing and viewing notifications.
+- Update the Notifications Center with collapse and open commands and status bar item.
 
 ## CI
 

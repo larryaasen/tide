@@ -7,7 +7,7 @@ import '../services/tide_workbench_layout_service.dart';
 import '../services/tide_workbench_service.dart';
 import '../tide.dart';
 import '../tide_core.dart';
-import '../widgets/tide_workbench.dart';
+import '../widgets/tide_workbench_accessor.dart';
 
 typedef TideActivityBarItemBuilder = TideActivityBarItem? Function(
     BuildContext context, TideId barId);
@@ -66,17 +66,21 @@ class _TideActivityBarState extends State<TideActivityBar> {
 
       final barItem = item as TideActivityBarItem;
 
-      return IconButton(
-        icon: Icon(barItem.icon,
-            color: index == _selectedIndex ? Colors.white : Colors.grey),
-        tooltip: barItem.title,
-        onPressed: () {
-          if (barItem.commandId != null) {
-            Tide.get<TideCommandService>().registry.executeCommand(
-                barItem.commandId!, barItem.commandParams, accessor);
-          }
-          setState(() => _selectedIndex = index);
-        },
+      return TooltipTheme(
+        data:
+            const TooltipThemeData(waitDuration: Duration(milliseconds: 1000)),
+        child: IconButton(
+          icon: Icon(barItem.icon,
+              color: index == _selectedIndex ? Colors.white : Colors.grey),
+          tooltip: barItem.title,
+          onPressed: () {
+            if (barItem.commandId != null) {
+              Tide.get<TideCommandService>().registry.executeCommand(
+                  barItem.commandId!, barItem.commandParams, accessor);
+            }
+            setState(() => _selectedIndex = index);
+          },
+        ),
       );
     }).toList();
 

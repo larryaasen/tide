@@ -6,8 +6,9 @@ Tide is a toolkit for building IDE and studio like apps on all platforms using F
 
 The widget set includes many components useful in creating apps for desktop.
 
-There is a workbench that can be used in any application that contains a status bar,
-activity bar, and panels, that can be controlled by commands and hot keys.
+There is a workbench that can be used in any Flutter application just like any other Widget.
+
+A workbench can contain a status bar, activity bar, and panels that can be all be controlled by commands and hot keys.
 
 # Key Concepts
 
