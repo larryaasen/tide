@@ -71,8 +71,3 @@ OTHER NAMES:
 ## Documentation
 
 - Need to document all public symbols.
-
-## Publishing
-
-- Update README
-- Prepare podspec.yaml file for pulication.

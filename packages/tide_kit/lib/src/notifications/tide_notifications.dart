@@ -9,7 +9,7 @@ import '../tide_core.dart';
 /// The severity of a notification.
 enum TideNotificationSeverity { none, info, warning, error }
 
-/// A notification that can be displayed on the workbench.
+/// A notification is a rich interactive message that is briefly displayed over the workbench.
 class TideNotification extends Equatable {
   /// Creates a new notification that can be displayed on the workbench.
   TideNotification({

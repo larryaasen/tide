@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:tide_kit/tide_kit.dart';
 
 /// Example 1: status bar with no panels.
-void main1() {
+void main() {
   final _ = Tide();
   runApp(const TideApp());
 }
@@ -877,7 +877,7 @@ void main18() {
 }
 
 /// Example 19: An activity bar with four items, and a status bar with a spinner, time, and notifications.
-void main() {
+void main19() {
   final tide = Tide();
 
   tide.useServices(services: [

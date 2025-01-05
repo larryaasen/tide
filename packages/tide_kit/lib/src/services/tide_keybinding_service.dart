@@ -4,6 +4,7 @@ import '../tide.dart';
 import '../tide_core.dart';
 import 'tide_command_service.dart';
 
+/// A key binding is a combination of keys (key set) that trigger a command.
 class TideKeybinding {
   const TideKeybinding({required this.keySet, required this.commandId});
   final LogicalKeySet keySet;

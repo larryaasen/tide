@@ -12,6 +12,8 @@ import '../widgets/tide_workbench_accessor.dart';
 typedef TideActivityBarItemBuilder = TideActivityBarItem? Function(
     BuildContext context, TideId barId);
 
+/// An activity bar is a vertical bar on the side of the workbench that contains various
+/// icon buttons.
 class TideActivityBar extends StatefulWidget {
   const TideActivityBar({
     super.key,

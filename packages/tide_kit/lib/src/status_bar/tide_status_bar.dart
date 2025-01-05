@@ -6,8 +6,8 @@ import '../tide.dart';
 import 'tide_status_bar_item.dart';
 import 'tide_status_bar_item_widgets.dart';
 
-/// A status bar with a default height of 22.0 pixels.
-/// The content area of a status bar item has a height of 22 pixels.
+/// A status bar is a short widget that is displayed at the bottom of a workbench and contains various items of minimal content.
+/// The content area of a status bar item has a default height of 22 pixels.
 class TideStatusBar extends StatelessWidget {
   const TideStatusBar({
     super.key,

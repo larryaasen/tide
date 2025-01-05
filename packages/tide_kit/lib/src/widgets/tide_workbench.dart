@@ -15,7 +15,8 @@ import 'tide_workbench_accessor.dart';
 typedef TidePanelBuilder = TidePanelWidget? Function(
     BuildContext context, TidePanel panel);
 
-/// A workbench widget.
+/// A workbench is the main widget that contains the activity bar, panels, and status bar. It is a
+/// child of the [TideWindow] widget.
 class TideWorkbench extends StatelessWidget {
   TideWorkbench({
     super.key,

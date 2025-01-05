@@ -30,7 +30,8 @@ import 'widgets/tide_workbench.dart';
 
 */
 
-/// Data model for a workbench panel.
+/// A panel is part of a workbench and displays the content. A [TidePanel] is a
+///  model for a workbench panel. Panels are displayed using a [TidePanelWidget].
 class TidePanel extends Equatable {
   const TidePanel({
     this.panelId = TideId.empty,
@@ -73,6 +74,7 @@ class TidePanel extends Equatable {
   }
 }
 
+/// The logging servcie is used to log messages to be displayed in the console.
 class TideLoggingService {
   final _buffer = <String>[];
   List<String> get buffer => _buffer;
@@ -87,6 +89,7 @@ class TideLoggingService {
   }
 }
 
+/// A console is a panel that displays log messages.
 class TideConsole extends StatefulWidget {
   const TideConsole(
       {super.key,
