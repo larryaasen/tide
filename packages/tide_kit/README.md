@@ -2,7 +2,7 @@
 
 Tide is a toolkit for building IDE and studio like apps on all platforms using Flutter.
 
-![Screenshot](docs/tide_example_3.png)
+![Screenshot](doc/tide_example_3.png)
 
 ### "Build apps faster"
 
