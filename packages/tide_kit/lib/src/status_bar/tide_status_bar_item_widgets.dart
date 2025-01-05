@@ -74,8 +74,10 @@ class TideStatusBarItemContainer extends StatelessWidget {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: state.isPressed
+                    // ignore: deprecated_member_use
                     ? Colors.grey.withOpacity(0.66)
                     : state.isHovering
+                        // ignore: deprecated_member_use
                         ? Colors.grey.withOpacity(0.33)
                         : null,
               ),
