@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -691,8 +690,7 @@ void main17() {
 
 /// Example 18: Notifications and time services, status bar with progress bar and other items, notifications,
 /// activity bar, with left panel and main panel.
-void main() {
-  Platform;
+void main18() {
   final tide = Tide();
 
   tide.useServices(services: [
@@ -731,13 +729,12 @@ void main() {
           statusBarColor.value =
               statusBarColor.value == null ? Colors.red : null;
         },
-        tooltip: 'Click to toggle the status bar color',
+        tooltip: 'Click to toggle the status bar',
         child: const Row(
           children: [
             Icon(Icons.sync, size: 16.0, color: Colors.white),
             SizedBox(width: 4.0),
-            Text('Toggle status bar color',
-                style: TideStatusBarItemTextWidget.style),
+            Text('Toggle status bar', style: TideStatusBarItemTextWidget.style),
           ],
         ),
       );
@@ -877,4 +874,140 @@ void main() {
       },
     ),
   );
+}
+
+/// Example 19: An activity bar with four items, and a status bar with a spinner, time, and notifications.
+void main() {
+  final tide = Tide();
+
+  tide.useServices(services: [
+    Tide.ids.service.notifications,
+    Tide.ids.service.time,
+  ]);
+
+  final leftPanelId = TideId.uniqueId();
+  final mainPanelId = TideId.uniqueId();
+
+  final workbenchService = Tide.get<TideWorkbenchService>();
+
+  // Add panels: left and main
+  workbenchService.layoutService.addPanels([
+    TidePanel(panelId: leftPanelId),
+    TidePanel(panelId: mainPanelId),
+  ]);
+
+  // Setup activity bar item: Search
+  workbenchService.layoutService.addActivityBarItems([
+    TideActivityBarItem(
+      title: 'Search (command-F)',
+      icon: Icons.search_rounded,
+    ),
+  ]);
+
+  // Setup activity bar item: Favorites
+  workbenchService.layoutService.addActivityBarItems([
+    TideActivityBarItem(
+      title: 'Favorites',
+      icon: Icons.favorite_border_rounded,
+    ),
+  ]);
+
+  // Setup activity bar item: Account
+  workbenchService.layoutService.addActivityBarItems([
+    TideActivityBarItem(
+        title: 'Account',
+        icon: Icons.account_circle_outlined,
+        position: TideActivityBarItemPosition.end),
+  ]);
+
+  // Setup activity bar item: Settings
+  workbenchService.layoutService.addActivityBarItems([
+    TideActivityBarItem(
+        title: 'Settings',
+        icon: Icons.settings_outlined,
+        position: TideActivityBarItemPosition.end),
+  ]);
+
+  TideNotification? timeNotification;
+
+  // Add status bar item: spinner
+  final spinnerVisible = ValueNotifier<bool>(false);
+  tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItem(
+    position: TideStatusBarItemPosition.left,
+    isVisible: spinnerVisible.value,
+    builder: (context, item) {
+      return TideStatusBarItemContainer(
+        item: item,
+        tooltip: 'Loading...',
+        child: const SizedBox(
+          width: 15.0,
+          height: 15.0,
+          child: CircularProgressIndicator(
+            strokeWidth: 1.0,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
+        ),
+      );
+    },
+  ));
+
+  // Ad status bar item: time
+  tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItemTime(
+    position: TideStatusBarItemPosition.right,
+    tooltip: 'The current time',
+    onPressed: (TideStatusBarItem item) {
+      final notificationService = Tide.get<TideNotificationService>();
+      if (timeNotification == null ||
+          !notificationService.notificationExists(timeNotification!.id)) {
+        final timeService = Tide.get<TideTimeService>();
+        final msg =
+            'The time is: ${timeService.currentTimeState.timeFormatted()}';
+        timeNotification =
+            notificationService.info(msg, autoTimeout: true, allowClose: false);
+      }
+    },
+  ));
+
+  // Add status bar item: notifications
+  tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItem(
+    position: TideStatusBarItemPosition.right,
+    builder: (context, item) {
+      return TideStatusBarItemContainer(
+        item: item,
+        tooltip: 'Notifications',
+        child: const Icon(Icons.notifications_none_outlined,
+            size: 16.0, color: Colors.white),
+      );
+    },
+  ));
+
+  runApp(TideApp(
+    home: TideWindow(
+      workbench: TideWorkbench(
+          activityBar: const TideActivityBar(),
+          panelBuilder: (context, panel) {
+            if (panel.panelId.id == leftPanelId.id) {
+              return TidePanelWidget(
+                panelId: panel.panelId,
+                backgroundColor: const Color(0xFFF3F3F3),
+                position: TidePosition.left,
+                resizeSide: TidePosition.right,
+                minWidth: 100,
+                maxWidth: 450,
+                initialWidth: 220,
+                child: const Center(child: Text('Left Panel')),
+              );
+            } else if (panel.panelId.id == mainPanelId.id) {
+              return const TidePanelWidget(
+                backgroundColor: Colors.white,
+                expanded: true,
+                position: TidePosition.center,
+                child: Center(child: Text('Main Panel')),
+              );
+            }
+            return null;
+          },
+          statusBar: const TideStatusBar()),
+    ),
+  ));
 }

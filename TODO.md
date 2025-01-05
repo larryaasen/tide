@@ -1,5 +1,29 @@
 # TODO
 
+NEW NAME NEEDED:
+- cozy
+- coz
+- koz
+- kozy (kozy.dev)
+- tidekit (tidekit.dev)
+
+OTHER NAMES:
+- cose
+- cove
+- side
+- wide
+- yide
+- tide_kit
+- tine
+- pint
+- aide
+- paid
+- paide
+- pide
+- alta
+- bine
+- flour
+
 - Move classes to individual files.
 
 ## Actions
@@ -43,6 +67,10 @@
 ## CI
 
 - Setup CI jobs for each platform.
+
+## Documentation
+
+- Need to document all public symbols.
 
 ## Publishing
 

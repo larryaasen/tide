@@ -2,6 +2,8 @@
 
 Tide is a toolkit for building IDE and studio like apps on all platforms using Flutter.
 
+![Screenshot](docs/tide_example_3.png)
+
 ### "Build apps faster"
 
 The widget set includes many components useful in creating apps for desktop.
@@ -29,6 +31,8 @@ Service: A service is a class that provides functionality to the system that doe
 Tide ID: An ID that is a unique identifier for an action, command, service, or extension.
 
 Widget: A Flutter widget that is part of the Tide UI.
+
+##
 
 # Widgets
 

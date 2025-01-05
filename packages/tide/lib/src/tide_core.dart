@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:get_it/get_it.dart';
 import 'package:uuid/uuid.dart';
 
-/// A service accessor for the Tide services to get instance to objects.
+/// A service accessor for the Tide services to get an instance to an object.
 typedef TideServicesAccessor = GetIt;
 
 enum TidePosition { left, top, center, right, bottom }

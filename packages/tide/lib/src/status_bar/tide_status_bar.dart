@@ -30,7 +30,7 @@ class TideStatusBar extends StatelessWidget {
     return ValueListenableBuilder<TideStatusBarState>(
         valueListenable: statusBarState,
         builder: (context, state, child) {
-          final stateItems = state.items.toList();
+          final stateItems = state.items;
           stateItems.addAll(items);
 
           final leftSide = stateItems
@@ -45,11 +45,12 @@ class TideStatusBar extends StatelessWidget {
               .toList();
 
           Widget widgetForItem(TideStatusBarItem item) {
+            if (!item.isVisible) return const SizedBox.shrink();
             final widget = item.builder?.call(context, item);
             if (widget != null) return widget;
 
             // TODO: make these not hardcoded here,
-            if (item.isVisible && item is TideStatusBarItemText) {
+            if (item is TideStatusBarItemText) {
               return TideStatusBarItemTextWidget(
                 item: item,
                 position: item.position,
@@ -58,7 +59,7 @@ class TideStatusBar extends StatelessWidget {
                 tooltip: item.tooltip,
               );
             }
-            if (item.isVisible && item is TideStatusBarItemTime) {
+            if (item is TideStatusBarItemTime) {
               return TideStatusBarItemTimeWidget(
                 item: item,
                 use24HourFormat: item.use24HourFormat,
@@ -66,7 +67,7 @@ class TideStatusBar extends StatelessWidget {
                 tooltip: item.tooltip,
               );
             }
-            if (item.isVisible && item is TideStatusBarItemProgress) {
+            if (item is TideStatusBarItemProgress) {
               return TideStatusBarItemProgressWidget(
                 item: item,
                 position: item.position,

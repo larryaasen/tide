@@ -1,11 +1,11 @@
 name: tide
-description: "A new Flutter package project."
+description: "A toolkit for building IDE and studio like apps."
 version: 1.0.0
-homepage:
+repository: https://github.com/larryaasen/tide
 
 environment:
   sdk: ^3.5.0
-  flutter: ^3.24.0
+  flutter: '>=3.24.0'
 
 dependencies:
   flutter:
