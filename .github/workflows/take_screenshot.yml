@@ -2,7 +2,7 @@ name: Take Screenshot
 
 defaults:
   run:
-    working-directory: packages/tide
+    working-directory: packages/tide_kit
 
 on:
   workflow_dispatch:
@@ -29,7 +29,7 @@ jobs:
           powershell.exe -File scripts/take_screenshot_windows.ps1
 
       - name: LS
-        run: bash.exe "ls -al"
+        run: bash.exe -c "ls -al;"
 
       - name: Upload screenshot
         uses: actions/upload-artifact@v4

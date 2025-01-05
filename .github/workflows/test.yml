@@ -2,7 +2,7 @@ name: Flutter Unit Tests
 
 defaults:
   run:
-    working-directory: packages/tide
+    working-directory: packages/tide_kit
 
 on:
   workflow_dispatch:
@@ -20,6 +20,7 @@ jobs:
         flutter-version: ['3.24.0', '3.24.5', '3.27.1']
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+    if: always()
 
     steps:
       - name: Checkout repository

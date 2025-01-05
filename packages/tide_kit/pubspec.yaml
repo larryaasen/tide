@@ -1,4 +1,4 @@
-name: tide
+name: tide_kit
 description: "A toolkit for building IDE and studio like apps."
 version: 1.0.0
 repository: https://github.com/larryaasen/tide

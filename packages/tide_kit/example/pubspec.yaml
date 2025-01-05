@@ -11,8 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  tide:
-    path: ../../tide
+  tide_kit:
+    path: ../../tide_kit
 
 dev_dependencies:
   flutter_test:

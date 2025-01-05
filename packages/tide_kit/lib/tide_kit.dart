@@ -1,4 +1,4 @@
-library tide;
+library tide_kit;
 
 export 'src/activity_bar/tide_activity_bar.dart';
 export 'src/commands/tide_action.dart';

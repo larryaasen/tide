@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tide/tide.dart';
+import 'package:tide_kit/tide_kit.dart';
 
 /// Example 1: status bar with no panels.
 void main1() {

@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:path/path.dart' as path_d;
-import 'package:tide/tide.dart';
+import 'package:tide_kit/tide_kit.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

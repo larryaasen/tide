@@ -1,11 +1,11 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:tide/src/notifications/tide_notifications.dart';
 
 import 'activity_bar/tide_activity_bar.dart';
 import 'commands/tide_command.dart';
 import 'commands/tide_contributions.dart';
+import 'notifications/tide_notifications.dart';
 import 'services/tide_command_service.dart';
 import 'services/tide_keybinding_service.dart';
 import 'services/tide_time_service.dart';
