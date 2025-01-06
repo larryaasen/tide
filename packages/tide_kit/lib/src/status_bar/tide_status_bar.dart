@@ -30,7 +30,7 @@ class TideStatusBar extends StatelessWidget {
     return ValueListenableBuilder<TideStatusBarState>(
         valueListenable: statusBarState,
         builder: (context, state, child) {
-          final stateItems = state.items;
+          final stateItems = state.items.toList(); // make a mutable copy
           stateItems.addAll(items);
 
           final leftSide = stateItems

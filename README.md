@@ -1,2 +1,2 @@
 This is a monorepo containing these packages:
-- [tide](packages/tide_kit/)
+- [tide_kit](packages/tide_kit/)

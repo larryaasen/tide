@@ -1,7 +1,12 @@
 name: tide_kit
 description: "A toolkit for building IDE and studio like apps."
 version: 1.0.0
-repository: https://github.com/larryaasen/tide
+repository: https://github.com/larryaasen/tide/tree/main/packages/tide_kit
+homepage: https://github.com/larryaasen/tide/tree/main/packages/tide_kit
+issue_tracker: https://github.com/larryaasen/tide/issues
+screenshots:
+  - description: 'Tide Example'
+    path: doc/tide_example_3.png
 
 environment:
   sdk: ^3.5.0
@@ -11,10 +16,10 @@ dependencies:
   flutter:
     sdk: flutter
 
-  equatable: ^2.0.5
+  equatable: ^2.0.1
   get_it: ^8.0.2
-  upgrader: ^11.0.0
-  uuid: ^3.0.7
+  os_detect: ^2.0.1
+  uuid: ^3.0.5
 
 dev_dependencies:
   flutter_test:
