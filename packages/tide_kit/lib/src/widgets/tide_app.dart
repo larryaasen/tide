@@ -17,7 +17,6 @@ class TideApp extends StatelessWidget {
       title: 'Tide Example',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
       ),
       home: home ?? TideWindow(),
       debugShowCheckedModeBanner: false,
