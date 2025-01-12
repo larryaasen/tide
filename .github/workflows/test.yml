@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Install example2 dependencies
+        run: cd example2; flutter pub get
+
       - name: Analyze
         run: flutter analyze
 
