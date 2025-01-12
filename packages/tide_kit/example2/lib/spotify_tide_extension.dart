@@ -282,8 +282,8 @@ class SpotifyService {
   void initialize() {
     Tide.log('SpotifyService.initialize');
 
-    const clientId = 'd7c4ce7c172041b8b63ef73e2afe9e3e';
-    const clientSecret = 'bea841230da9405a8ad650cb1cc8bfc8';
+    const clientId = 'tbd';
+    const clientSecret = 'tbd';
     final credentials = SpotifyApiCredentials(clientId, clientSecret);
     spotify = SpotifyApi(credentials);
   }

@@ -1,6 +1,6 @@
 ## Next
 
-- Added example 2 which is a Spotify search app.
+- Added example 2 which is a Spotify search app containing the SpotifyTideExtension.
 - Added the TidePanelTitleBar, TideSearchPanel, and TideSearchTextField widgets.
 
 ## 1.0.1
