@@ -6,9 +6,16 @@
     "configurations": [
         {
             "name": "tide example",
-            "cwd": "packages/tide/example",
+            "cwd": "packages/tide_kit/example",
             "request": "launch",
             "type": "dart"
+        },
+        {
+            "name": "tide 2 example",
+            "cwd": "packages/tide_kit/example2",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart"
         }
     ]
 }

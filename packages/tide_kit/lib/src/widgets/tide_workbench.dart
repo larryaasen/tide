@@ -68,6 +68,7 @@ class TideWorkbench extends StatelessWidget {
       if (panel.panelBuilder != null) {
         return panel.panelBuilder!(context, panel) ?? const TidePanelWidget();
       }
+      assert(panelBuilder != null);
       return panelBuilder!(context, panel) ?? const TidePanelWidget();
     }).toList();
 

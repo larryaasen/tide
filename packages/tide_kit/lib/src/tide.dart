@@ -33,6 +33,7 @@ import 'widgets/tide_workbench.dart';
 /// A panel is part of a workbench and displays the content. A [TidePanel] is a
 ///  model for a workbench panel. Panels are displayed using a [TidePanelWidget].
 class TidePanel extends Equatable {
+  /// Creates a panel is part of a workbench and displays the content.
   const TidePanel({
     this.panelId = TideId.empty,
     this.isVisible = true,
@@ -270,8 +271,9 @@ class Tide {
   /// Initialize the Tide instance
   void initialize() {}
 
-  void addExtension(TideExtension extension) {
-    extension.activate(this);
+  TideExtension addExtension(TideExtension tideExtension) {
+    tideExtension.activate(this);
+    return tideExtension;
   }
 
   void _registerOptionalServices() {

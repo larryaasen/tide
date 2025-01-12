@@ -45,3 +45,94 @@ class TidePanelWidget extends StatelessWidget {
     );
   }
 }
+
+class TidePanelTitleBar extends StatelessWidget {
+  const TidePanelTitleBar({super.key, this.title = ''});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10.0, top: 10.0, bottom: 10.0),
+      child: Row(
+        children: [
+          Text(
+            title.toUpperCase(),
+            style: const TextStyle(
+                color: Colors.black54,
+                fontSize: 11.0,
+                fontWeight: FontWeight.w400),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class TideSearchPanel extends StatelessWidget {
+  const TideSearchPanel({super.key, this.onChanged, this.results});
+
+  /// Called when the user initiates a change to the search field's value: when they have inserted or deleted text.
+  final ValueChanged<String>? onChanged;
+
+  final Widget? results;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const TidePanelTitleBar(title: 'Search'),
+        TideSearchTextField(onChanged: onChanged),
+        if (results != null) Expanded(child: results!),
+      ],
+    );
+  }
+}
+
+class TideSearchTextField extends StatelessWidget {
+  const TideSearchTextField({
+    super.key,
+    this.onChanged,
+  });
+
+  /// Called when the user initiates a change to the TextField's value: when they have inserted or deleted text.
+  final ValueChanged<String>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
+      child: TextField(
+        cursorColor: Colors.black54,
+        cursorHeight: 11.0,
+        cursorWidth: 1.0,
+        decoration: const InputDecoration(
+          border: InputBorder.none,
+          hoverColor: Colors.white,
+          fillColor: Colors.white,
+          filled: true,
+          alignLabelWithHint: true,
+          hintText: 'Search',
+          hintStyle: TextStyle(
+              color: Colors.black54,
+              fontSize: 12.0,
+              height: 1.0,
+              leadingDistribution: TextLeadingDistribution.even,
+              textBaseline: TextBaseline.alphabetic),
+          isDense: true,
+          contentPadding: EdgeInsets.only(bottom: 10.0, top: 10.0, left: 4.0),
+
+          // border: InputBorder.none,
+        ),
+        style: const TextStyle(
+          color: Colors.black54,
+          fontSize: 13.0,
+          height: 1.0,
+          leadingDistribution: TextLeadingDistribution.even,
+        ),
+        onChanged: (value) => onChanged?.call(value),
+      ),
+    );
+  }
+}
