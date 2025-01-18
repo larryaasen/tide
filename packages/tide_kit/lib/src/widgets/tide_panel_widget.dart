@@ -70,12 +70,18 @@ class TidePanelTitleBar extends StatelessWidget {
   }
 }
 
+/// A panel that displays a search field and search results.
 class TideSearchPanel extends StatelessWidget {
-  const TideSearchPanel({super.key, this.onChanged, this.results});
+  const TideSearchPanel(
+      {super.key, this.searchFieldFocusNode, this.onChanged, this.results});
+
+  /// The focus node that should be used for the search field.
+  final FocusNode? searchFieldFocusNode;
 
   /// Called when the user initiates a change to the search field's value: when they have inserted or deleted text.
   final ValueChanged<String>? onChanged;
 
+  /// The widget that displays the search results.
   final Widget? results;
 
   @override
@@ -83,27 +89,38 @@ class TideSearchPanel extends StatelessWidget {
     return Column(
       children: [
         const TidePanelTitleBar(title: 'Search'),
-        TideSearchTextField(onChanged: onChanged),
+        TideSearchTextField(
+            focusNode: searchFieldFocusNode, onChanged: onChanged),
         if (results != null) Expanded(child: results!),
       ],
     );
   }
 }
 
-class TideSearchTextField extends StatelessWidget {
+class TideSearchTextField extends StatefulWidget {
   const TideSearchTextField({
     super.key,
+    this.focusNode,
     this.onChanged,
   });
+
+  final FocusNode? focusNode;
 
   /// Called when the user initiates a change to the TextField's value: when they have inserted or deleted text.
   final ValueChanged<String>? onChanged;
 
   @override
+  State<TideSearchTextField> createState() => _TideSearchTextFieldState();
+}
+
+class _TideSearchTextFieldState extends State<TideSearchTextField> {
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
       child: TextField(
+        autofocus: true,
+        focusNode: widget.focusNode,
         cursorColor: Colors.black54,
         cursorHeight: 11.0,
         cursorWidth: 1.0,
@@ -131,7 +148,7 @@ class TideSearchTextField extends StatelessWidget {
           height: 1.0,
           leadingDistribution: TextLeadingDistribution.even,
         ),
-        onChanged: (value) => onChanged?.call(value),
+        onChanged: (value) => widget.onChanged?.call(value),
       ),
     );
   }

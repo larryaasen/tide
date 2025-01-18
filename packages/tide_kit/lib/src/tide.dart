@@ -218,14 +218,39 @@ class Tide {
   static final ids = TideIds();
 
   /// Creates the [Tide] instance and registers the built-in features.
-  Tide() {
-    _initialize();
+  Tide({bool focusLogging = false}) {
+    _initialize(focusLogging);
   }
 
-  void _initialize() {
+  void _initialize(bool focusLogging) {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    if (focusLogging) {
+      _setupFocusDebugging();
+    }
+
     _registerStandardServices();
     _registerStandardCommands();
     _registerOptionalServices();
+  }
+
+  /// Add a listener to log focus changes.
+  void _setupFocusDebugging() {
+    FocusManager.instance.addListener(_focusChangeListener);
+
+    Tide.log('Tide: TideFocusListener added');
+  }
+
+  /// Called when the focus changes to log the focused widget.
+  void _focusChangeListener() {
+    final currentFocus = FocusManager.instance.primaryFocus;
+    Tide.log('Tide: TideFocusListener: $currentFocus');
+    if (currentFocus != null) {
+      Tide.log(
+          'Tide: TideFocusListener: focused widget: ${currentFocus.context?.widget}');
+    } else {
+      Tide.log('Tide: TideFocusListener: no focused widget');
+    }
   }
 
   /// Register the standard services such as the command and workbench services.
@@ -348,4 +373,9 @@ abstract class TideExtension {
 
   /// Deactivate this extension.
   void deactivate() {}
+}
+
+/// A convenience function to run a function (computation) in the next event loop.
+void dispatch(void Function() computation) {
+  Future.delayed(Duration.zero, computation);
 }

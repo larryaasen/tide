@@ -9,7 +9,7 @@ Tide Kit is a toolkit for building IDE and studio like apps on all platforms usi
 
 ![Screenshot](doc/tide_example_3.png)
 
-# Building apps faster
+# Build tools faster
 
 Using Tide Kit will make building cross platform IDE and studio desktop faster by utilizing a common set of pre-built widgets and services. It is ideal for desktop and web apps, but will also run on mobile.
 
@@ -308,6 +308,15 @@ void main() {
 }
 ```
 ![Screenshot](doc/tide_example_3.png)
+
+### Example 4
+![Screenshot](doc/tide_example_4.png)
+### Search Example
+For the code for example 5, look at [example2/lib/main.dart](https://github.com/larryaasen/tide/tree/main/packages/tide_kit/example2/lib/main.dart) and [example2/lib/spotify_tide_extension.dart](https://github.com/larryaasen/tide/tree/main/packages/tide_kit/example2/lib/spotify_tide_extension.dart)
+
+![Screenshot](doc/tide_example_5.png)
+### Spotify Example
+![Screenshot](doc/tide_example_6.png)
 
 <!--
 # Widgets

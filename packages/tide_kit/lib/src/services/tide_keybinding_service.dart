@@ -67,6 +67,7 @@ class TideKeyboardListener extends StatelessWidget {
     final keybindingService = Tide.get<TideKeybindingService>();
 
     return FocusableActionDetector(
+      key: const Key('TideKeyboardListener.FocusableActionDetector'),
       // focusNode: _focusNode,
       autofocus: true,
       shortcuts: keybindingService.shortcuts(),
@@ -83,7 +84,10 @@ class TideKeyboardListener extends StatelessWidget {
           },
         ),
       },
-      child: child,
+      child: FocusScope(
+        key: const Key('TideKeyboardListener.FocusScope'),
+        child: child,
+      ),
     );
   }
 }
