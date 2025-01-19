@@ -11,7 +11,7 @@ Tide Kit is a toolkit for building IDE and studio like apps on all platforms usi
 
 # Build tools faster
 
-Using Tide Kit will make building cross platform IDE and studio desktop faster by utilizing a common set of pre-built widgets and services. It is ideal for desktop and web apps, but will also run on mobile.
+Using Tide Kit will make building cross platform IDE and studio desktop tools faster by utilizing a common set of pre-built widgets and services. It is ideal for desktop and web apps, but will also run on mobile.
 
 The UI includes a window widget and a workbench widget that can be used in any Flutter application just like any other Widget.
 
