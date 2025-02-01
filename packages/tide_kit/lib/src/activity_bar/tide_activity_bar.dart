@@ -31,6 +31,7 @@ class TideActivityBar extends StatefulWidget {
 }
 
 class _TideActivityBarState extends State<TideActivityBar> {
+  TideActivityBarItem? _hoveringBarItem;
   int _selectedIndex = 0;
 
   @override
@@ -68,20 +69,28 @@ class _TideActivityBarState extends State<TideActivityBar> {
 
       final barItem = item as TideActivityBarItem;
 
-      return TooltipTheme(
-        data:
-            const TooltipThemeData(waitDuration: Duration(milliseconds: 1000)),
-        child: IconButton(
-          icon: Icon(barItem.icon,
-              color: index == _selectedIndex ? Colors.white : Colors.grey),
-          tooltip: barItem.title,
-          onPressed: () {
-            if (barItem.commandId != null) {
-              Tide.get<TideCommandService>().registry.executeCommand(
-                  barItem.commandId!, barItem.commandParams, accessor);
-            }
-            setState(() => _selectedIndex = index);
-          },
+      return MouseRegion(
+        onEnter: (event) => setState(() => _hoveringBarItem = barItem),
+        onExit: (event) => setState(() => _hoveringBarItem = null),
+        child: TooltipTheme(
+          data: const TooltipThemeData(
+              waitDuration: Duration(milliseconds: 1000)),
+          child: IconButton(
+            icon: Icon(barItem.icon,
+                color: _hoveringBarItem == barItem || index == _selectedIndex
+                    ? Colors.white
+                    : Colors.grey),
+            tooltip: barItem.title,
+            onPressed: () {
+              if (barItem.commandId != null) {
+                Tide.get<TideCommandService>().registry.executeCommand(
+                    barItem.commandId!, barItem.commandParams, accessor);
+              }
+              setState(() {
+                if (barItem.selectable) _selectedIndex = index;
+              });
+            },
+          ),
         ),
       );
     }).toList();
@@ -108,6 +117,7 @@ class TideActivityBarItem extends Equatable {
     this.commandId,
     this.commandParams = const {},
     this.position = TideActivityBarItemPosition.start,
+    this.selectable = true,
   }) {
     this.itemId = itemId ?? TideId.uniqueId();
   }
@@ -118,6 +128,7 @@ class TideActivityBarItem extends Equatable {
   final TideId? commandId;
   final TideCommandParams commandParams;
   final TideActivityBarItemPosition position;
+  final bool selectable;
 
   @override
   List<Object?> get props =>

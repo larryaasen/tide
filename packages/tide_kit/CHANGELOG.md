@@ -1,3 +1,7 @@
+## 1.2.0
+
+- Activity bar items: Added selectable option which defaults to true, and highlight on hover.
+
 ## 1.1.0
 
 - Added example 2 which is a Spotify search app containing the SpotifyTideExtension.

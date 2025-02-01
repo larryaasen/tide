@@ -286,11 +286,13 @@ void main11() {
   workbenchService.layoutService.addActivityBarItems([
     TideActivityBarItem(title: 'Explorer', icon: Icons.file_copy_outlined),
     TideActivityBarItem(title: 'Search', icon: Icons.search_outlined),
-    TideActivityBarItem(title: 'Share', icon: Icons.share_outlined),
+    TideActivityBarItem(
+        title: 'Share', icon: Icons.share_outlined, selectable: false),
     TideActivityBarItem(
         title: 'Settings',
         icon: Icons.settings_outlined,
-        position: TideActivityBarItemPosition.end),
+        position: TideActivityBarItemPosition.end,
+        selectable: false),
   ]);
 
   runApp(

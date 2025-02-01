@@ -220,12 +220,12 @@ class TideStatusBarItemTimeWidget extends StatelessWidget {
           '  tide.initialize(services: [Tide.ids.service.time]);');
       throw Exception('TideTimeService is not registered.');
     }
-    return StreamBuilder<TideDiveTimeState>(
+    return StreamBuilder<TideTimeState>(
       stream: timeService.stream,
       initialData: timeService.currentTimeState,
       builder: (context, snapshot) {
         final text = snapshot.hasData
-            ? (snapshot.data as TideDiveTimeState)
+            ? (snapshot.data as TideTimeState)
                 .timeFormatted(use24HourFormat: use24HourFormat)
             : '';
         return TideStatusBarItemTextWidget(

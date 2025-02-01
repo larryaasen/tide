@@ -1,8 +1,8 @@
 import 'dart:async';
 
-/// The state that is output in the stream by [DiveTimeService].
-class TideDiveTimeState {
-  const TideDiveTimeState(this.now);
+/// The state that is output in the stream by [TideTimeService].
+class TideTimeState {
+  const TideTimeState(this.now);
 
   final DateTime now;
 
@@ -47,14 +47,14 @@ class TideTimeService {
   }
 
   /// Create a StreamController
-  final _controller = StreamController<TideDiveTimeState>.broadcast();
+  final _controller = StreamController<TideTimeState>.broadcast();
 
-  Stream<TideDiveTimeState> get stream => _controller.stream;
+  Stream<TideTimeState> get stream => _controller.stream;
   DateTime get currentTime => DateTime.now();
-  TideDiveTimeState get currentTimeState => TideDiveTimeState(currentTime);
+  TideTimeState get currentTimeState => TideTimeState(currentTime);
 
   /// Update the state.
-  void _updateState(TideDiveTimeState newState) {
+  void _updateState(TideTimeState newState) {
     // Add data to stream
     _controller.sink.add(newState);
   }
