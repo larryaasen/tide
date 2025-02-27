@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:tide_kit/tide_kit.dart';
 
 /// Example 1: status bar with no panels.
-void main() {
+void main1() {
   final _ = Tide();
   runApp(const TideApp());
 }
@@ -727,7 +727,7 @@ void main18() {
     builder: (context, item) {
       return TideStatusBarItemContainer(
         item: item,
-        onPressed: (TideStatusBarItem item) {
+        onPressed: (BuildContext context, TideStatusBarItem item) {
           statusBarColor.value =
               statusBarColor.value == null ? Colors.red : null;
         },
@@ -749,7 +749,7 @@ void main18() {
     infinite: false,
     progressTotal: 10.0,
     progressWorked: progressWorked,
-    onPressedClose: (TideStatusBarItem item) {
+    onPressedClose: (BuildContext context, TideStatusBarItem item) {
       if (item is TideStatusBarItemProgress) {
         final newItem = item.copyWith(infinite: true);
         tide.workbenchService.layoutService.replaceStatusBarItem(newItem);
@@ -787,7 +787,7 @@ void main18() {
   // An example of using a text status bar item that is clickable and shows notifications.
   tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItemText(
     position: TideStatusBarItemPosition.right,
-    onPressed: (TideStatusBarItem item) {
+    onPressed: (BuildContext context, TideStatusBarItem item) {
       final notificationService = Tide.get<TideNotificationService>();
       final notification = TideNotification(
           message: 'Flutter: Hot reloading...',
@@ -814,7 +814,7 @@ void main18() {
   tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItemTime(
     position: TideStatusBarItemPosition.right,
     tooltip: 'The current time',
-    onPressed: (TideStatusBarItem item) {
+    onPressed: (BuildContext context, TideStatusBarItem item) {
       final notificationService = Tide.get<TideNotificationService>();
       if (timeNotification == null ||
           !notificationService.notificationExists(timeNotification!.id)) {
@@ -957,7 +957,7 @@ void main19() {
   tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItemTime(
     position: TideStatusBarItemPosition.right,
     tooltip: 'The current time',
-    onPressed: (TideStatusBarItem item) {
+    onPressed: (BuildContext context, TideStatusBarItem item) {
       final notificationService = Tide.get<TideNotificationService>();
       if (timeNotification == null ||
           !notificationService.notificationExists(timeNotification!.id)) {
@@ -1012,4 +1012,116 @@ void main19() {
           statusBar: const TideStatusBar()),
     ),
   ));
+}
+
+/// Example 20: Quick input box, status bar with item, search panel, and notification.
+void main20() {
+  final tide = Tide();
+  tide.useServices(services: [Tide.ids.service.notifications]);
+
+  tide.workbenchService.layoutService.addPanel(TidePanel(
+    panelBuilder: (context, panel) {
+      return TidePanelWidget(
+        panelId: panel.panelId,
+        backgroundColor: const Color(0xFFF3F3F3),
+        position: TidePosition.left,
+        resizeSide: TidePosition.right,
+        minWidth: 150,
+        maxWidth: 450,
+        initialWidth: 220,
+        child: const TideSearchPanel(),
+      );
+    },
+  ));
+
+  runApp(
+    TideApp(
+      home: TideWindow(
+        workbench: TideWorkbench(
+          statusBar: TideStatusBar(
+            items: [
+              TideStatusBarItemText(
+                  text: 'Create new branch...',
+                  icon: Icons.merge,
+                  position: TideStatusBarItemPosition.left,
+                  onPressed: (BuildContext context, item) {
+                    final inputBox = TideQuickInputBox(
+                      placeholder: 'Branch name',
+                      prompt: 'Please provide a new branch name',
+                      onDidAccept: (String value) {
+                        final notificationService =
+                            Tide.get<TideNotificationService>();
+                        notificationService.info('Created branch name: $value');
+                      },
+                    );
+
+                    TideQuickInputBoxWidget.show(context, inputBox);
+                  }),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+/// Example 21: Quick pick input dialog, status bar with item, and notification.
+void main() {
+  final tide = Tide(focusLogging: true);
+  tide.useServices(services: [Tide.ids.service.notifications]);
+
+  runApp(
+    TideApp(
+      home: TideWindow(
+        workbench: TideWorkbench(
+          statusBar: TideStatusBar(
+            items: [
+              TideStatusBarItemText(
+                  text: 'Git',
+                  icon: Icons.merge,
+                  position: TideStatusBarItemPosition.left,
+                  onPressed: (BuildContext context, item) {
+                    final quickPick = TideQuickPick(
+                      placeholder: 'Select a branch or tag to checkout',
+                      items: [
+                        TideQuickPickItem(
+                            label: 'Create new branch...',
+                            leadingIcon: Icons.add),
+                        TideQuickPickItem(
+                          label: 'Create new branch from...',
+                          leadingIcon: Icons.add,
+                        ),
+                        TideQuickPickItem(
+                            label: 'Checkout detached...',
+                            leadingIcon: Icons.tag,
+                            showSeparator: true),
+                        TideQuickPickItem(
+                          label: 'main (c5e89a99c)',
+                          leadingIcon: Icons.add,
+                          showSeparator: true,
+                        ),
+                        TideQuickPickItem(
+                          label: '1.0.0 Tag at (a00d2922)',
+                          leadingIcon: Icons.add,
+                        ),
+                        TideQuickPickItem(
+                          label: '1.0.1 Tag at (1931a1c1)',
+                          leadingIcon: Icons.add,
+                        ),
+                      ],
+                      onDidAccept: (TideQuickPickItem item) {
+                        final notificationService =
+                            Tide.get<TideNotificationService>();
+                        notificationService.info('Selected: ${item.label}');
+                      },
+                    );
+
+                    TideQuickPickWidget.show(context, quickPick);
+                  }),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }

@@ -45,7 +45,7 @@ class TideStatusBarItemContainer extends StatelessWidget {
   final TideStatusBarItem item;
 
   /// Called when the button is tapped or otherwise activated.
-  final TideOnPressedCallback? onPressed;
+  final TideOnPressedItemCallback? onPressed;
 
   final String? tooltip;
 
@@ -63,7 +63,7 @@ class TideStatusBarItemContainer extends StatelessWidget {
           final inkWell = InkWell(
             onHover: (hovering) =>
                 this.state.value = state.copyWith(isHovering: hovering),
-            onTap: () => onPressed?.call(item),
+            onTap: () => onPressed?.call(context, item),
             onTapDown: (TapDownDetails details) =>
                 this.state.value = state.copyWith(isPressed: true),
             onTapUp: (TapUpDetails details) =>
@@ -106,6 +106,7 @@ class TideStatusBarItemTextWidget extends StatelessWidget {
   const TideStatusBarItemTextWidget({
     super.key,
     required this.item,
+    this.icon,
     this.position = TideStatusBarItemPosition.center,
     required this.text,
     this.onPressed,
@@ -113,10 +114,11 @@ class TideStatusBarItemTextWidget extends StatelessWidget {
   });
 
   final TideStatusBarItem item;
+  final IconData? icon;
   final TideStatusBarItemPosition position;
 
   /// Called when the button is tapped or otherwise activated.
-  final TideOnPressedCallback? onPressed;
+  final TideOnPressedItemCallback? onPressed;
 
   final String? tooltip;
 
@@ -135,7 +137,13 @@ class TideStatusBarItemTextWidget extends StatelessWidget {
       item: item,
       onPressed: onPressed,
       tooltip: tooltip,
-      child: Text(text, style: style),
+      child: Row(
+        children: [
+          if (icon != null) Icon(icon, size: 16.0, color: Colors.white),
+          if (icon != null) const SizedBox(width: 4.0),
+          Text(text, style: style),
+        ],
+      ),
     );
   }
 }
@@ -158,7 +166,7 @@ class TideStatusBarItemProgressWidget extends StatelessWidget {
   final TideStatusBarItemPosition position;
 
   /// Called when the close button is tapped or otherwise activated.
-  final TideOnPressedCallback? onPressedClose;
+  final TideOnPressedItemCallback? onPressedClose;
 
   /// The tooltip to display when hovering over the progress bar.
   final String? tooltip;
@@ -176,7 +184,8 @@ class TideStatusBarItemProgressWidget extends StatelessWidget {
         children: [
           SizedBox(width: 100, child: LinearProgressIndicator(value: value)),
           const SizedBox(width: 4.0),
-          TideRoundCloseIcon(onPressed: () => onPressedClose?.call(item)),
+          TideRoundCloseIcon(
+              onPressed: () => onPressedClose?.call(context, item)),
         ],
       ),
     );
@@ -203,7 +212,7 @@ class TideStatusBarItemTimeWidget extends StatelessWidget {
   final bool use24HourFormat;
 
   /// Called when the button is tapped or otherwise activated.
-  final TideOnPressedCallback? onPressed;
+  final TideOnPressedItemCallback? onPressed;
 
   final String? tooltip;
 

@@ -41,6 +41,8 @@ This section defines key concepts of Tide Kit.
 
 **Panel**: A panel is part of a workbench and displays the content.
 
+**Quick Input**:  A way to gather user input, either by entering text or selecting an option.
+
 **Registry**: A registry is a collection of objects that can be retrieved by a class Type.
 
 **Service**: A service is a class that provides functionality to the system that does not have a UI.
@@ -317,6 +319,28 @@ For the code for example 5, look at [example2/lib/main.dart](https://github.com/
 ![Screenshot](doc/tide_example_5.png)
 ### Spotify Example
 ![Screenshot](doc/tide_example_6.png)
+
+### Quick Input
+
+Use `TideQuickInputBox` as a way to gather user input fron a `TextField`. It is a generic prompt
+to allow a user to enter text.
+![Screenshot](doc/tide_example_7.png)
+```dart
+  ...
+  onPressed: (BuildContext context, item) {
+    final inputBox = TideQuickInputBox(
+      placeholder: 'Branch name',
+      prompt: 'Please provide a new branch name',
+      onDidAccept: (String value) {
+        final notificationService =
+            Tide.get<TideNotificationService>();
+        notificationService.info('Created branch name: $value');
+      },
+    );
+
+    TideQuickInputBoxWidget.show(context, inputBox);
+  }),
+```
 
 <!--
 # Widgets

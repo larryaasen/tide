@@ -52,6 +52,7 @@ class TideStatusBar extends StatelessWidget {
             // TODO: make these not hardcoded here,
             if (item is TideStatusBarItemText) {
               return TideStatusBarItemTextWidget(
+                icon: item.icon,
                 item: item,
                 position: item.position,
                 text: item.text,

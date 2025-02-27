@@ -74,7 +74,7 @@ Future<void> main() async {
   tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItemTime(
     position: TideStatusBarItemPosition.right,
     tooltip: 'The current time',
-    onPressed: (TideStatusBarItem item) {
+    onPressed: (BuildContext context, TideStatusBarItem item) {
       final notificationService = Tide.get<TideNotificationService>();
       if (timeNotification == null ||
           !notificationService.notificationExists(timeNotification!.id)) {

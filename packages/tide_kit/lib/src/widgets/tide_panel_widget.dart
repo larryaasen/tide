@@ -89,67 +89,92 @@ class TideSearchPanel extends StatelessWidget {
     return Column(
       children: [
         const TidePanelTitleBar(title: 'Search'),
-        TideSearchTextField(
-            focusNode: searchFieldFocusNode, onChanged: onChanged),
+        Padding(
+          padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
+          child: TideTextField(
+              focusNode: searchFieldFocusNode,
+              hintText: 'Search',
+              onChanged: onChanged),
+        ),
         if (results != null) Expanded(child: results!),
       ],
     );
   }
 }
 
-class TideSearchTextField extends StatefulWidget {
-  const TideSearchTextField({
+class TideTextField extends StatefulWidget {
+  const TideTextField({
     super.key,
     this.focusNode,
+    this.hintText,
+    this.controller,
     this.onChanged,
+    this.onSubmitted,
   });
 
   final FocusNode? focusNode;
+  final String? hintText;
+  final TextEditingController? controller;
 
   /// Called when the user initiates a change to the TextField's value: when they have inserted or deleted text.
   final ValueChanged<String>? onChanged;
 
+  /// Called when the user indicates that they are done editing the text in the field.
+  final ValueChanged<String>? onSubmitted;
+
   @override
-  State<TideSearchTextField> createState() => _TideSearchTextFieldState();
+  State<TideTextField> createState() => _TideTextFieldState();
 }
 
-class _TideSearchTextFieldState extends State<TideSearchTextField> {
+class _TideTextFieldState extends State<TideTextField> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
-      child: TextField(
-        autofocus: true,
-        focusNode: widget.focusNode,
-        cursorColor: Colors.black54,
-        cursorHeight: 11.0,
-        cursorWidth: 1.0,
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-          hoverColor: Colors.white,
-          fillColor: Colors.white,
-          filled: true,
-          alignLabelWithHint: true,
-          hintText: 'Search',
-          hintStyle: TextStyle(
-              color: Colors.black54,
-              fontSize: 12.0,
-              height: 1.0,
-              leadingDistribution: TextLeadingDistribution.even,
-              textBaseline: TextBaseline.alphabetic),
-          isDense: true,
-          contentPadding: EdgeInsets.only(bottom: 10.0, top: 10.0, left: 4.0),
+    return TextField(
+      autofocus: true,
+      controller: widget.controller,
+      cursorColor: Colors.black54,
+      cursorHeight: 11.0,
+      cursorWidth: 1.0,
+      decoration: InputDecoration(
+        // border: InputBorder.none,
+        border: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(2.0)),
+          borderSide: BorderSide(color: Colors.transparent, width: 0.0),
+        ),
+        enabledBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(2.0)),
+          borderSide: BorderSide(color: Colors.transparent, width: 0.0),
+        ),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(2.0)),
+          borderSide: BorderSide(color: Colors.blue, width: 1.0),
+        ),
+        hoverColor: Colors.white,
+        fillColor: Colors.white,
+        filled: true,
+        alignLabelWithHint: true,
+        hintText: widget.hintText,
+        hintStyle: const TextStyle(
+            color: Colors.black54,
+            fontSize: 12.0,
+            height: 1.0,
+            leadingDistribution: TextLeadingDistribution.even,
+            textBaseline: TextBaseline.alphabetic),
+        isDense: true,
+        contentPadding:
+            const EdgeInsets.only(bottom: 10.0, top: 10.0, left: 4.0),
 
-          // border: InputBorder.none,
-        ),
-        style: const TextStyle(
-          color: Colors.black54,
-          fontSize: 13.0,
-          height: 1.0,
-          leadingDistribution: TextLeadingDistribution.even,
-        ),
-        onChanged: (value) => widget.onChanged?.call(value),
+        // border: InputBorder.none,
       ),
+      focusNode: widget.focusNode,
+      style: const TextStyle(
+        color: Colors.black54,
+        fontSize: 13.0,
+        height: 1.0,
+        leadingDistribution: TextLeadingDistribution.even,
+      ),
+      onChanged: (value) => widget.onChanged?.call(value),
+      onSubmitted: (value) => widget.onSubmitted?.call(value),
     );
   }
 }

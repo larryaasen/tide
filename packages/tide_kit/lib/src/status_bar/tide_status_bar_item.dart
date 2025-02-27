@@ -7,7 +7,8 @@ typedef TideStatusBarItemBuilder = Widget? Function(
     BuildContext context, TideStatusBarItem item);
 
 /// Signature of callbacks that have no arguments and return no data.
-typedef TideOnPressedCallback = void Function(TideStatusBarItem item);
+typedef TideOnPressedItemCallback = void Function(
+    BuildContext context, TideStatusBarItem item);
 
 enum TideStatusBarItemPosition {
   left,
@@ -33,7 +34,7 @@ class TideStatusBarItem extends Equatable {
   final String? tooltip;
 
   /// Called when the button is tapped or otherwise activated.
-  final TideOnPressedCallback? onPressed;
+  final TideOnPressedItemCallback? onPressed;
 
   final TideStatusBarItemBuilder? builder;
 
@@ -46,7 +47,7 @@ class TideStatusBarItem extends Equatable {
     bool? isVisible,
     TideStatusBarItemPosition? position,
     String? tooltip,
-    TideOnPressedCallback? onPressed,
+    TideOnPressedItemCallback? onPressed,
     TideStatusBarItemBuilder? builder,
   }) {
     return TideStatusBarItem(
@@ -69,13 +70,16 @@ class TideStatusBarItemText extends TideStatusBarItem {
     super.onPressed,
     super.builder,
     required this.text,
+    this.icon,
   });
 
   /// The text to be displayed.
   final String text;
 
+  final IconData? icon;
+
   @override
-  List<Object?> get props => [...super.props, text];
+  List<Object?> get props => [...super.props, text, icon];
 
   @override
   TideStatusBarItemText copyWith({
@@ -83,9 +87,10 @@ class TideStatusBarItemText extends TideStatusBarItem {
     bool? isVisible,
     TideStatusBarItemPosition? position,
     String? tooltip,
-    TideOnPressedCallback? onPressed,
+    TideOnPressedItemCallback? onPressed,
     TideStatusBarItemBuilder? builder,
     String? text,
+    IconData? icon,
   }) {
     return TideStatusBarItemText(
       itemId: itemId ?? super.itemId,
@@ -95,6 +100,7 @@ class TideStatusBarItemText extends TideStatusBarItem {
       onPressed: onPressed ?? super.onPressed,
       builder: builder ?? super.builder,
       text: text ?? this.text,
+      icon: icon ?? this.icon,
     );
   }
 }
@@ -121,7 +127,7 @@ class TideStatusBarItemTime extends TideStatusBarItem {
     bool? isVisible,
     TideStatusBarItemPosition? position,
     String? tooltip,
-    TideOnPressedCallback? onPressed,
+    TideOnPressedItemCallback? onPressed,
     TideStatusBarItemBuilder? builder,
     bool? use24HourFormat,
   }) {
@@ -161,7 +167,7 @@ class TideStatusBarItemProgress extends TideStatusBarItem {
   final num? progressWorked;
 
   /// Called when the close button is tapped or otherwise activated.
-  final TideOnPressedCallback? onPressedClose;
+  final TideOnPressedItemCallback? onPressedClose;
 
   @override
   List<Object?> get props =>
@@ -173,12 +179,12 @@ class TideStatusBarItemProgress extends TideStatusBarItem {
     bool? isVisible,
     TideStatusBarItemPosition? position,
     String? tooltip,
-    TideOnPressedCallback? onPressed,
+    TideOnPressedItemCallback? onPressed,
     TideStatusBarItemBuilder? builder,
     bool? infinite,
     num? progressTotal,
     num? progressWorked,
-    TideOnPressedCallback? onPressedClose,
+    TideOnPressedItemCallback? onPressedClose,
   }) {
     return TideStatusBarItemProgress(
       itemId: itemId ?? super.itemId,

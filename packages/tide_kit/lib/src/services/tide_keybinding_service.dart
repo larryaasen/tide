@@ -34,11 +34,6 @@ class TideKeybindingService {
     }
     return shortcuts;
   }
-
-  /// Called whenever this widget receives a keyboard event.
-  void onKeyEvent(KeyEvent event) {
-    Tide.log('Tide: TideKeybindingService key event: ${event.logicalKey}');
-  }
 }
 
 class TideActivateIntent extends ActivateIntent {
