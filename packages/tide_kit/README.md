@@ -41,7 +41,7 @@ This section defines key concepts of Tide Kit.
 
 **Panel**: A panel is part of a workbench and displays the content.
 
-**Quick Input**:  A way to gather user input, either by entering text or selecting an option.
+**Quick Input**:  A way to gather user input, either by entering text or selecting an option from a list.
 
 **Registry**: A registry is a collection of objects that can be retrieved by a class Type.
 
@@ -339,6 +339,50 @@ to allow a user to enter text.
     );
 
     TideQuickInputBoxWidget.show(context, inputBox);
+  }),
+```
+
+Use `TideQuickPick` as a way to gather user input from a list of items. The user can filter the list by entering text into the text field. The list supports up and down arrow movement to highlight specific rows, and the highlighted item can be selectced by clicking or the hitting the Enter/Return key.
+![Screenshot](doc/tide_example_8.png)
+```dart
+  ...
+  onPressed: (BuildContext context, item) {
+    final quickPick = TideQuickPick(
+      placeholder: 'Select a branch or tag to checkout',
+      items: [
+        TideQuickPickItem(
+            label: 'Create new branch...',
+            leadingIcon: Icons.add),
+        TideQuickPickItem(
+          label: 'Create new branch from...',
+          leadingIcon: Icons.add,
+        ),
+        TideQuickPickItem(
+            label: 'Checkout detached...',
+            leadingIcon: Icons.tag,
+            showSeparator: true),
+        TideQuickPickItem(
+          label: 'main (c5e89a99c)',
+          leadingIcon: Icons.add,
+          showSeparator: true,
+        ),
+        TideQuickPickItem(
+          label: '1.0.0 Tag at (a00d2922)',
+          leadingIcon: Icons.add,
+        ),
+        TideQuickPickItem(
+          label: '1.0.1 Tag at (1931a1c1)',
+          leadingIcon: Icons.add,
+        ),
+      ],
+      onDidAccept: (TideQuickPickItem item) {
+        final notificationService =
+            Tide.get<TideNotificationService>();
+        notificationService.info('Selected: ${item.label}');
+      },
+    );
+
+    TideQuickPickWidget.show(context, quickPick);
   }),
 ```
 

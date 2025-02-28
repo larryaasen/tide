@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'theme/tide_theme.dart';
-import 'tide.dart';
 import 'tide_core.dart';
 import 'widgets/tide_panel_widget.dart';
 
@@ -167,45 +166,31 @@ class _TideQuickPickWidgetState extends State<TideQuickPickWidget> {
 
   TideQuickPickItem? _selectedItem;
   int? _selectedIndex;
+  String _filter = '';
+  List<TideQuickPickItem> _filteredItems = [];
 
   @override
   void initState() {
     _controller.text = widget.quickPick.value;
-    _selectedItem =
-        widget.quickPick.items.isNotEmpty ? widget.quickPick.items.first : null;
-    _selectedIndex = widget.quickPick.items.isNotEmpty ? 0 : null;
+
+    _setupFilter();
+
     super.initState();
+  }
+
+  void _setupFilter() {
+    _filteredItems = _filter.isEmpty
+        ? widget.quickPick.items
+        : widget.quickPick.items.where((item) {
+            return item.label.toLowerCase().contains(_filter.toLowerCase());
+          }).toList();
+    _selectedItem = _filteredItems.isNotEmpty ? _filteredItems.first : null;
+    _selectedIndex = _filteredItems.isNotEmpty ? 0 : null;
   }
 
   @override
   Widget build(BuildContext context) {
     final title = widget.quickPick.title ?? '';
-    /*
-    return AlertDialog(
-      title: Text("Select an Item"),
-      content: Container(
-        width: double.maxFinite, // Ensures it takes full width
-        child: SizedBox(
-          height: 200, // Fixed height to prevent intrinsic dimension error
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text("Item $index"),
-              );
-            },
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text("Close"),
-        ),
-      ],
-    );
-    */
 
     return AlertDialog(
         scrollable: true,
@@ -236,7 +221,7 @@ class _TideQuickPickWidgetState extends State<TideQuickPickWidget> {
           const SizedBox(height: 8.0),
           Expanded(
             child: SingleChildScrollView(
-                child: Column(children: _buildListItems(_selectedItem))),
+                child: Column(children: _buildListItems())),
           ),
         ],
       ),
@@ -247,10 +232,10 @@ class _TideQuickPickWidgetState extends State<TideQuickPickWidget> {
       onDownArrow: () {
         setState(() {
           if (_selectedIndex != null) {
-            _selectedIndex = _selectedIndex == widget.quickPick.items.length - 1
+            _selectedIndex = _selectedIndex == _filteredItems.length - 1
                 ? 0
                 : _selectedIndex! + 1;
-            _selectedItem = widget.quickPick.items[_selectedIndex!];
+            _selectedItem = _filteredItems[_selectedIndex!];
           }
         });
       },
@@ -258,9 +243,9 @@ class _TideQuickPickWidgetState extends State<TideQuickPickWidget> {
         setState(() {
           if (_selectedIndex != null) {
             _selectedIndex = _selectedIndex == 0
-                ? widget.quickPick.items.length - 1
+                ? _filteredItems.length - 1
                 : _selectedIndex! - 1;
-            _selectedItem = widget.quickPick.items[_selectedIndex!];
+            _selectedItem = _filteredItems[_selectedIndex!];
           }
         });
       },
@@ -278,6 +263,12 @@ class _TideQuickPickWidgetState extends State<TideQuickPickWidget> {
       TideTextField(
         controller: _controller,
         hintText: widget.quickPick.placeholder,
+        onChanged: (value) {
+          setState(() {
+            _filter = value;
+            _setupFilter();
+          });
+        },
         onSubmitted: (value) {
           if (_selectedItem != null) {
             widget.quickPick.onDidAccept?.call(_selectedItem!);
@@ -288,9 +279,9 @@ class _TideQuickPickWidgetState extends State<TideQuickPickWidget> {
     ];
   }
 
-  List<Widget> _buildListItems(TideQuickPickItem? selectedItem) {
-    final items = widget.quickPick.items.map((item) {
-      final selected = item == selectedItem;
+  List<Widget> _buildListItems() {
+    final items = _filteredItems.map((item) {
+      final selected = item == _selectedItem;
       final child = TideQuickPickItemWidget(item: item, selected: selected);
       final inkWell = InkWell(
         onTap: () {
@@ -384,7 +375,6 @@ class TideSelectionActionDetector extends StatelessWidget {
       actions: <Type, Action<Intent>>{
         TideLogicalKeyIntent: CallbackAction<TideLogicalKeyIntent>(
           onInvoke: (TideLogicalKeyIntent intent) {
-            Tide.log(intent.key);
             if (intent.key == LogicalKeyboardKey.arrowDown) {
               onDownArrow?.call();
             }
