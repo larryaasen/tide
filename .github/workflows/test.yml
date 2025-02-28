@@ -9,9 +9,13 @@ on:
   push:
     branches:
       - '**'
+    paths-ignore:
+      - 'packages/tide_kit/CHANGELOG.md'
   pull_request:
     branches:
       - '**'
+    paths-ignore:
+      - 'packages/tide_kit/CHANGELOG.md'
 
 jobs:
   test:

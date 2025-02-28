@@ -2,7 +2,6 @@
 
 - Added [TideQuickInputBox] as a way to gather user input from a [TextField].
 - Added [TideQuickPick] as a way to gather user input from a list of items.
-
 - The onPressed for TideStatusBarItem now contains the BuildContext.
 
 ## 1.2.0
