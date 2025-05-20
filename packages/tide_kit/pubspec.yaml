@@ -3,6 +3,7 @@ description: "Tide Kit is a toolkit for building IDE and studio like apps on all
 version: 1.4.0
 repository: https://github.com/larryaasen/tide/tree/main/packages/tide_kit
 homepage: https://github.com/larryaasen/tide/tree/main/packages/tide_kit
+issue_tracker: https://github.com/larryaasen/tide/issues
 screenshots:
   - description: 'Tide Example'
     path: doc/tide_example_3.png
