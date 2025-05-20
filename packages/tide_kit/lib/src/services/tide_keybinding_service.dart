@@ -61,6 +61,8 @@ class TideKeyboardListener extends StatelessWidget {
   Widget build(BuildContext context) {
     final keybindingService = Tide.get<TideKeybindingService>();
 
+    final commandParams = <String, Object>{'_context': context};
+
     return FocusableActionDetector(
       key: const Key('TideKeyboardListener.FocusableActionDetector'),
       // focusNode: _focusNode,
@@ -71,9 +73,7 @@ class TideKeyboardListener extends StatelessWidget {
           onInvoke: (TideActivateIntent intent) {
             Tide.log(intent);
             Tide.get<TideCommandService>().registry.executeCommand(
-                intent.keybinding.commandId,
-                {} /*item.commandParams*/,
-                accessor);
+                intent.keybinding.commandId, commandParams, accessor);
 
             return null;
           },

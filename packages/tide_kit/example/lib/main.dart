@@ -879,7 +879,7 @@ void main18() {
 }
 
 /// Example 19: An activity bar with four items, and a status bar with a spinner, time, and notifications.
-void main19() {
+void main() {
   final tide = Tide();
 
   tide.useServices(services: [
@@ -922,10 +922,15 @@ void main19() {
         position: TideActivityBarItemPosition.end),
   ]);
 
+  const settingsCommandId = TideId('app.command.settings');
+  Tide.registerCommandContribution(
+      SettingsContribution(commandId: settingsCommandId));
+
   // Setup activity bar item: Settings
   workbenchService.layoutService.addActivityBarItems([
     TideActivityBarItem(
         title: 'Settings',
+        commandId: settingsCommandId,
         icon: Icons.settings_outlined,
         position: TideActivityBarItemPosition.end),
   ]);
@@ -1066,7 +1071,7 @@ void main20() {
 }
 
 /// Example 21: Quick pick input dialog, status bar with item, and notification.
-void main() {
+void main21() {
   final tide = Tide(focusLogging: true);
   tide.useServices(services: [Tide.ids.service.notifications]);
 
@@ -1124,4 +1129,24 @@ void main() {
       ),
     ),
   );
+}
+
+/// Contributes a command that shows the Settings Screen.
+class SettingsContribution extends TideCommandContribution {
+  final TideId commandId;
+
+  SettingsContribution({required this.commandId});
+
+  @override
+  void registerCommands(TideCommandRegistry registry) {
+    registry.registerCommand(commandId, _handler);
+  }
+
+  void _handler(TideCommand command, TideCommandParams commandParams,
+      TideServicesAccessor accessor) {
+    final context = commandParams['_context'] as BuildContext?;
+    if (context != null) {
+      showAboutDialog(context: context);
+    }
+  }
 }

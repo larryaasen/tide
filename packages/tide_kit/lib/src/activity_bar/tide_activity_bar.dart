@@ -83,8 +83,10 @@ class _TideActivityBarState extends State<TideActivityBar> {
             tooltip: barItem.title,
             onPressed: () {
               if (barItem.commandId != null) {
+                final commandParams = <String, Object>{'_context': context}
+                  ..addAll(barItem.commandParams);
                 Tide.get<TideCommandService>().registry.executeCommand(
-                    barItem.commandId!, barItem.commandParams, accessor);
+                    barItem.commandId!, commandParams, accessor);
               }
               setState(() {
                 if (barItem.selectable) _selectedIndex = index;

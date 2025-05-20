@@ -1,3 +1,7 @@
+## 1.4.0
+
+- Added the BuildContext to the command options of executeCommand when a command is executed.
+
 ## 1.3.0
 
 - Added [TideQuickInputBox] as a way to gather user input from a [TextField].
