@@ -66,6 +66,7 @@ class TideStatusBar extends StatelessWidget {
                 use24HourFormat: item.use24HourFormat,
                 onPressed: item.onPressed,
                 tooltip: item.tooltip,
+                formatPattern: item.formatPattern,
               );
             }
             if (item is TideStatusBarItemProgress) {

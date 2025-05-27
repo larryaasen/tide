@@ -1,3 +1,7 @@
+## 1.5.0
+
+- Added a time format pattern to the TideStatusBarItemTime for flexible time and date formatting. See Example 20 for more details.
+
 ## 1.4.0
 
 - Added the BuildContext to the command options of executeCommand when a command is executed.

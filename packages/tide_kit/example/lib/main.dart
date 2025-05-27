@@ -879,7 +879,7 @@ void main18() {
 }
 
 /// Example 19: An activity bar with four items, and a status bar with a spinner, time, and notifications.
-void main() {
+void main19() {
   final tide = Tide();
 
   tide.useServices(services: [
@@ -958,7 +958,7 @@ void main() {
     },
   ));
 
-  // Ad status bar item: time
+  // Add status bar item: time
   tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItemTime(
     position: TideStatusBarItemPosition.right,
     tooltip: 'The current time',
@@ -1020,9 +1020,12 @@ void main() {
 }
 
 /// Example 20: Quick input box, status bar with item, search panel, and notification.
-void main20() {
+void main() {
   final tide = Tide();
-  tide.useServices(services: [Tide.ids.service.notifications]);
+  tide.useServices(services: [
+    Tide.ids.service.notifications,
+    Tide.ids.service.time,
+  ]);
 
   tide.workbenchService.layoutService.addPanel(TidePanel(
     panelBuilder: (context, panel) {
@@ -1037,6 +1040,13 @@ void main20() {
         child: const TideSearchPanel(),
       );
     },
+  ));
+
+  // Add status bar item: time
+  tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItemTime(
+    position: TideStatusBarItemPosition.right,
+    tooltip: 'The current date',
+    formatPattern: 'EEE MMM d',
   ));
 
   runApp(

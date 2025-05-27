@@ -47,6 +47,7 @@ class TideStatusBarItemContainer extends StatelessWidget {
   /// Called when the button is tapped or otherwise activated.
   final TideOnPressedItemCallback? onPressed;
 
+  /// The tooltip to display when hovering over the status bar item.
   final String? tooltip;
 
   final Widget child;
@@ -120,6 +121,7 @@ class TideStatusBarItemTextWidget extends StatelessWidget {
   /// Called when the button is tapped or otherwise activated.
   final TideOnPressedItemCallback? onPressed;
 
+  /// The tooltip to display when hovering over the status bar item.
   final String? tooltip;
 
   final String text;
@@ -203,6 +205,7 @@ class TideStatusBarItemTimeWidget extends StatelessWidget {
     super.key,
     required this.item,
     this.use24HourFormat = false,
+    this.formatPattern,
     this.onPressed,
     this.tooltip = 'Current Time',
   });
@@ -211,9 +214,13 @@ class TideStatusBarItemTimeWidget extends StatelessWidget {
 
   final bool use24HourFormat;
 
+  /// The format pattern to use for the time display using [intl.DateFormat].
+  final String? formatPattern;
+
   /// Called when the button is tapped or otherwise activated.
   final TideOnPressedItemCallback? onPressed;
 
+  /// The tooltip to display when hovering over the status bar item.
   final String? tooltip;
 
   @override
@@ -233,9 +240,12 @@ class TideStatusBarItemTimeWidget extends StatelessWidget {
       stream: timeService.stream,
       initialData: timeService.currentTimeState,
       builder: (context, snapshot) {
-        final text = snapshot.hasData
-            ? (snapshot.data as TideTimeState)
-                .timeFormatted(use24HourFormat: use24HourFormat)
+        final state =
+            snapshot.hasData ? (snapshot.data as TideTimeState) : null;
+        final text = state != null
+            ? formatPattern != null
+                ? state.formatted(formatPattern!)
+                : state.timeFormatted(use24HourFormat: use24HourFormat)
             : '';
         return TideStatusBarItemTextWidget(
           item: item,

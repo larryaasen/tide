@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:intl/intl.dart';
+
 /// The state that is output in the stream by [TideTimeService].
 class TideTimeState {
   const TideTimeState(this.now);
@@ -25,6 +27,12 @@ class TideTimeState {
 
     String timeOnly = '$hour:$minutes:$seconds$amPM';
     return timeOnly;
+  }
+
+  /// Formats the current time according to the given pattern using [intl.DateFormat].
+  String formatted(String pattern) {
+    final fmt = DateFormat(pattern);
+    return fmt.format(now);
   }
 }
 

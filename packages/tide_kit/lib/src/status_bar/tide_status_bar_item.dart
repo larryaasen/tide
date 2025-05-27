@@ -31,6 +31,8 @@ class TideStatusBarItem extends Equatable {
   late final TideId itemId;
   final bool isVisible;
   final TideStatusBarItemPosition position;
+
+  /// The tooltip to display when hovering over the status bar item.
   final String? tooltip;
 
   /// Called when the button is tapped or otherwise activated.
@@ -114,12 +116,16 @@ class TideStatusBarItemTime extends TideStatusBarItem {
     super.onPressed,
     super.builder,
     this.use24HourFormat = false,
+    this.formatPattern,
   });
 
   final bool use24HourFormat;
 
+  /// The format pattern to use for the time display using [intl.DateFormat].
+  final String? formatPattern;
+
   @override
-  List<Object?> get props => [...super.props, use24HourFormat];
+  List<Object?> get props => [...super.props, use24HourFormat, formatPattern];
 
   @override
   TideStatusBarItemTime copyWith({
@@ -130,6 +136,7 @@ class TideStatusBarItemTime extends TideStatusBarItem {
     TideOnPressedItemCallback? onPressed,
     TideStatusBarItemBuilder? builder,
     bool? use24HourFormat,
+    String? formatPattern,
   }) {
     return TideStatusBarItemTime(
       itemId: itemId ?? super.itemId,
@@ -139,6 +146,7 @@ class TideStatusBarItemTime extends TideStatusBarItem {
       onPressed: onPressed ?? super.onPressed,
       builder: builder ?? super.builder,
       use24HourFormat: use24HourFormat ?? this.use24HourFormat,
+      formatPattern: formatPattern ?? this.formatPattern,
     );
   }
 }
