@@ -879,7 +879,7 @@ void main18() {
 }
 
 /// Example 19: An activity bar with four items, and a status bar with a spinner, time, and notifications.
-void main19() {
+void main() {
   final tide = Tide();
 
   tide.useServices(services: [
@@ -922,18 +922,7 @@ void main19() {
         position: TideActivityBarItemPosition.end),
   ]);
 
-  const settingsCommandId = TideId('app.command.settings');
-  Tide.registerCommandContribution(
-      SettingsContribution(commandId: settingsCommandId));
-
-  // Setup activity bar item: Settings
-  workbenchService.layoutService.addActivityBarItems([
-    TideActivityBarItem(
-        title: 'Settings',
-        commandId: settingsCommandId,
-        icon: Icons.settings_outlined,
-        position: TideActivityBarItemPosition.end),
-  ]);
+  addAbout(tide);
 
   TideNotification? timeNotification;
 
@@ -1020,7 +1009,7 @@ void main19() {
 }
 
 /// Example 20: Quick input box, status bar with item, search panel, and notification.
-void main() {
+void main20() {
   final tide = Tide();
   tide.useServices(services: [
     Tide.ids.service.notifications,
@@ -1141,11 +1130,36 @@ void main21() {
   );
 }
 
-/// Contributes a command that shows the Settings Screen.
-class SettingsContribution extends TideCommandContribution {
+void addAbout(Tide tide) {
+  final workbenchService = Tide.get<TideWorkbenchService>();
+
+  const aboutCommandId = TideId('app.command.about');
+  Tide.registerCommandContribution(
+      AboutDialogContribution(commandId: aboutCommandId));
+
+  // Setup activity bar item: About
+  workbenchService.layoutService.addActivityBarItems([
+    TideActivityBarItem(
+        title: 'About',
+        commandId: aboutCommandId,
+        icon: Icons.info_outlined,
+        position: TideActivityBarItemPosition.end),
+  ]);
+
+  tide.useServices(services: [Tide.ids.service.keybindings]);
+  final bindings = Tide.get<TideKeybindingService>();
+  bindings.addBinding(
+    TideKeybinding(
+        keySet: LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.keyA),
+        commandId: aboutCommandId),
+  );
+}
+
+/// Contributes a command that shows the About dialog.
+class AboutDialogContribution extends TideCommandContribution {
   final TideId commandId;
 
-  SettingsContribution({required this.commandId});
+  AboutDialogContribution({required this.commandId});
 
   @override
   void registerCommands(TideCommandRegistry registry) {

@@ -313,10 +313,63 @@ void main() {
 
 ### Example 4
 ![Screenshot](doc/tide_example_4.png)
+
+### Command Contribution Example
+Here is an example that demonstrates how to register a custom command contribution that displays the About dialog from an activity bar item.
+
+```dart
+void addAbout(Tide tide) {
+  final workbenchService = Tide.get<TideWorkbenchService>();
+
+  const aboutCommandId = TideId('app.command.about');
+  Tide.registerCommandContribution(
+      AboutDialogContribution(commandId: aboutCommandId));
+
+  // Setup activity bar item: About
+  workbenchService.layoutService.addActivityBarItems([
+    TideActivityBarItem(
+        title: 'About',
+        commandId: aboutCommandId,
+        icon: Icons.info_outlined,
+        position: TideActivityBarItemPosition.end),
+  ]);
+
+  tide.useServices(services: [Tide.ids.service.keybindings]);
+  final bindings = Tide.get<TideKeybindingService>();
+  bindings.addBinding(
+    TideKeybinding(
+        keySet: LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.keyA),
+        commandId: aboutCommandId),
+  );
+}
+
+/// Contributes a command that shows the About dialog.
+class AboutDialogContribution extends TideCommandContribution {
+  final TideId commandId;
+
+  AboutDialogContribution({required this.commandId});
+
+  @override
+  void registerCommands(TideCommandRegistry registry) {
+    registry.registerCommand(commandId, _handler);
+  }
+
+  void _handler(TideCommand command, TideCommandParams commandParams,
+      TideServicesAccessor accessor) {
+    final context = commandParams['_context'] as BuildContext?;
+    if (context != null) {
+      showAboutDialog(context: context);
+    }
+  }
+}
+```
+
+
 ### Search Example
 For the code for example 5, look at [example2/lib/main.dart](https://github.com/larryaasen/tide/tree/main/packages/tide_kit/example2/lib/main.dart) and [example2/lib/spotify_tide_extension.dart](https://github.com/larryaasen/tide/tree/main/packages/tide_kit/example2/lib/spotify_tide_extension.dart)
 
 ![Screenshot](doc/tide_example_5.png)
+
 ### Spotify Example
 ![Screenshot](doc/tide_example_6.png)
 

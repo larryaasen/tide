@@ -1,3 +1,7 @@
+## Next
+
+- Added Command Contribution Example to README.
+
 ## 1.5.0
 
 - Added a time format pattern to the TideStatusBarItemTime for flexible time and date formatting. See Example 20 for more details.
