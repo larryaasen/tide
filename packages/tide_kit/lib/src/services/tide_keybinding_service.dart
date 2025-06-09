@@ -59,7 +59,7 @@ class TideKeyboardListener extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final keybindingService = Tide.get<TideKeybindingService>();
+    final keybindingService = Tide.getIt<TideKeybindingService>();
 
     final commandParams = <String, Object>{'_context': context};
 
@@ -72,7 +72,7 @@ class TideKeyboardListener extends StatelessWidget {
         TideActivateIntent: CallbackAction<TideActivateIntent>(
           onInvoke: (TideActivateIntent intent) {
             Tide.log(intent);
-            Tide.get<TideCommandService>().registry.executeCommand(
+            Tide.getIt<TideCommandService>().registry.executeCommand(
                 intent.keybinding.commandId, commandParams, accessor);
 
             return null;

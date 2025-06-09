@@ -136,7 +136,7 @@ class SpotifyTideExtension extends TideExtension {
     //   use24HourFormat: true,
     // ));
 
-    final bindings = Tide.get<TideKeybindingService>();
+    final bindings = Tide.getIt<TideKeybindingService>();
 
     // Add shortcuts / bindings / hotkeys
 
@@ -496,8 +496,16 @@ class SpotifyService {
   void initialize() {
     Tide.log('SpotifyService.initialize');
 
-    const clientId = 'd7c4ce7c172041b8b63ef73e2afe9e3e';
+    // The Spotify client ID is not provided here for security reasons.
+    // You should obtain it from your Spotify for Developers
+    // account here: https://developer.spotify.com/
+    const clientId = 'tbd';
+
+    // The Spotify client secret is not provided here for security reasons.
+    // You should obtain it from your Spotify for Developers
+    // account here: https://developer.spotify.com/
     const clientSecret = 'tbd';
+
     final credentials = spotify.SpotifyApiCredentials(clientId, clientSecret);
     _spotify = spotify.SpotifyApi(credentials);
   }

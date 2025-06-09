@@ -1,6 +1,6 @@
 name: tide_kit
 description: "Tide Kit is a toolkit for building IDE and studio like apps on all platforms using Flutter."
-version: 1.5.0
+version: 1.6.0
 repository: https://github.com/larryaasen/tide/tree/main/packages/tide_kit
 homepage: https://github.com/larryaasen/tide/tree/main/packages/tide_kit
 issue_tracker: https://github.com/larryaasen/tide/issues

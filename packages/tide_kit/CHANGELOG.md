@@ -1,5 +1,7 @@
-## Next
+## 1.6.0
 
+- Added an optional badge to an activity bar item.
+- Renamed Tide.get to Tide.getIt.
 - Added Command Contribution Example to README.
 
 ## 1.5.0

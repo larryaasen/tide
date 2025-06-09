@@ -20,6 +20,7 @@ export 'src/tide_os.dart';
 export 'src/tide_quick_input.dart';
 export 'src/tide_resizer.dart';
 export 'src/widgets/tide_app.dart';
+export 'src/widgets/tide_badge.dart';
 export 'src/widgets/tide_calendar_day_pane.dart';
 export 'src/widgets/tide_panel_widget.dart';
 export 'src/widgets/tide_round_close_icon.dart';

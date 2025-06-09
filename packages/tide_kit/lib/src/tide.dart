@@ -201,7 +201,7 @@ class Tide {
   // workbenchService;
 
   /// The one [GetIt] instance for Tide level instances.
-  static GetIt get get => _getIt;
+  static GetIt get getIt => _getIt;
 
   /// Optional services that can be started.
   final _servicesAvailable = <String, TideCreateHandler>{};
@@ -210,10 +210,10 @@ class Tide {
       _servicesAvailable.containsKey(serviceId);
 
   /// The one [TideCommandService] instance for all workbenches.
-  static TideCommandService get commandService => get<TideCommandService>();
+  static TideCommandService get commandService => getIt<TideCommandService>();
 
   /// The one [TideWorkbenchService] instance for all workbenches.
-  TideWorkbenchService get workbenchService => get<TideWorkbenchService>();
+  TideWorkbenchService get workbenchService => getIt<TideWorkbenchService>();
 
   static final ids = TideIds();
 
@@ -256,13 +256,13 @@ class Tide {
   /// Register the standard services such as the command and workbench services.
   void _registerStandardServices() {
     // Register the command service.
-    if (!get.isRegistered<TideCommandService>()) {
-      get.registerSingleton(TideCommandService());
+    if (!getIt.isRegistered<TideCommandService>()) {
+      getIt.registerSingleton(TideCommandService());
     }
 
     // Register the workbench service.
-    if (!get.isRegistered<TideWorkbenchService>()) {
-      get.registerSingleton(TideWorkbenchService());
+    if (!getIt.isRegistered<TideWorkbenchService>()) {
+      getIt.registerSingleton(TideWorkbenchService());
     }
   }
 
@@ -306,15 +306,15 @@ class Tide {
 
     // Register the keybinding service.
     _servicesAvailable[ids.service.keybindings.id] = () =>
-        get.registerSingleton<TideKeybindingService>(TideKeybindingService());
+        getIt.registerSingleton<TideKeybindingService>(TideKeybindingService());
 
     // Register the notification service.
-    _servicesAvailable[ids.service.notifications.id] = () => get
+    _servicesAvailable[ids.service.notifications.id] = () => getIt
         .registerSingleton<TideNotificationService>(TideNotificationService());
 
     // Register the time service.
     _servicesAvailable[ids.service.time.id] =
-        () => get.registerSingleton<TideTimeService>(TideTimeService());
+        () => getIt.registerSingleton<TideTimeService>(TideTimeService());
   }
 
   final List<TideId> _servicesUsed = [];

@@ -12,7 +12,7 @@ Future<void> main() async {
     Tide.ids.service.time,
   ]);
 
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
 
   // Setup activity bar item: Search
   workbenchService.layoutService.addActivityBarItems([
@@ -24,12 +24,24 @@ Future<void> main() async {
   ]);
 
   // Setup activity bar item: Favorites
+  const favoritesId = TideId('app.activityBarItem.favorites');
   workbenchService.layoutService.addActivityBarItems([
     TideActivityBarItem(
+      itemId: favoritesId,
       title: 'Favorites',
       icon: Icons.favorite_border_rounded,
     ),
   ]);
+
+  final favoritesItem =
+      workbenchService.layoutService.activityBarItem(favoritesId);
+  if (favoritesItem != null) {
+    final newItem = favoritesItem.copyWith(
+      badgeValue: 2,
+      badgeTooltip: '2 favorites',
+    );
+    workbenchService.layoutService.replaceActivityBarItem(newItem);
+  }
 
   // Setup activity bar item: Account
   workbenchService.layoutService.addActivityBarItems([
@@ -46,6 +58,17 @@ Future<void> main() async {
         icon: Icons.settings_outlined,
         position: TideActivityBarItemPosition.end),
   ]);
+
+  // Setup activity bar item badge builder, which is optional because there is
+  // a default badge builder.
+  workbenchService.layoutService.activityBarBadgeBuilder =
+      (BuildContext context, TideActivityBarItem item) {
+    if (item.itemId == favoritesId) {
+      // Return the default badge widget.
+      return const TideBadge(badgeValue: 4);
+    }
+    return const SizedBox.shrink();
+  };
 
   TideNotification? timeNotification;
 
@@ -75,10 +98,10 @@ Future<void> main() async {
     position: TideStatusBarItemPosition.right,
     tooltip: 'The current time',
     onPressed: (BuildContext context, TideStatusBarItem item) {
-      final notificationService = Tide.get<TideNotificationService>();
+      final notificationService = Tide.getIt<TideNotificationService>();
       if (timeNotification == null ||
           !notificationService.notificationExists(timeNotification!.id)) {
-        final timeService = Tide.get<TideTimeService>();
+        final timeService = Tide.getIt<TideTimeService>();
         final msg =
             'The time is: ${timeService.currentTimeState.timeFormatted()}';
         timeNotification =

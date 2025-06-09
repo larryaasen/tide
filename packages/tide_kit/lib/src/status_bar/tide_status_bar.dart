@@ -22,7 +22,7 @@ class TideStatusBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final workbenchService = Tide.get<TideWorkbenchService>();
+    final workbenchService = Tide.getIt<TideWorkbenchService>();
     final statusBarState = workbenchService.accessor
         .get<TideWorkbenchLayoutService>()
         .statusBarState;

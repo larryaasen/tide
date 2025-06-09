@@ -36,19 +36,19 @@ class _TideActivityBarState extends State<TideActivityBar> {
 
   @override
   Widget build(BuildContext context) {
-    final workbenchService = Tide.get<TideWorkbenchService>();
+    final workbenchService = Tide.getIt<TideWorkbenchService>();
     return ValueListenableBuilder<TideWorkbenchLayoutState>(
       valueListenable:
           workbenchService.accessor.get<TideWorkbenchLayoutService>().state,
       builder: (context, state, child) {
-        return _buildInternal(context, state.activityBar);
+        return _buildInternal(context, state.activityBar,
+            workbenchService.accessor.get<TideWorkbenchLayoutService>());
       },
     );
   }
 
-  Widget _buildInternal(BuildContext context, TideActivityBarState state) {
-    final accessor = TideWorkbenchAccessor.of(context).accessor;
-
+  Widget _buildInternal(BuildContext context, TideActivityBarState state,
+      TideWorkbenchLayoutService layoutService) {
     final start = state.items
         .where((panel) => panel.position == TideActivityBarItemPosition.start)
         .toList();
@@ -68,6 +68,27 @@ class _TideActivityBarState extends State<TideActivityBar> {
       }
 
       final barItem = item as TideActivityBarItem;
+      final tooltip = barItem.badgeTooltip != null
+          ? '${barItem.title} - ${barItem.badgeTooltip}'
+          : barItem.title;
+      final icon = Icon(barItem.icon,
+          color: _hoveringBarItem == barItem || index == _selectedIndex
+              ? Colors.white
+              : Colors.grey);
+
+      final badgedIcon = barItem.badgeValue != null
+          ? Stack(
+              children: [
+                icon,
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: layoutService.activityBarBadgeBuilder
+                      .call(context, barItem),
+                ),
+              ],
+            )
+          : icon;
 
       return MouseRegion(
         onEnter: (event) => setState(() => _hoveringBarItem = barItem),
@@ -76,16 +97,15 @@ class _TideActivityBarState extends State<TideActivityBar> {
           data: const TooltipThemeData(
               waitDuration: Duration(milliseconds: 1000)),
           child: IconButton(
-            icon: Icon(barItem.icon,
-                color: _hoveringBarItem == barItem || index == _selectedIndex
-                    ? Colors.white
-                    : Colors.grey),
-            tooltip: barItem.title,
+            icon: badgedIcon,
+            tooltip: tooltip,
             onPressed: () {
               if (barItem.commandId != null) {
+                final accessor = TideWorkbenchAccessor.of(context).accessor;
+
                 final commandParams = <String, Object>{'_context': context}
                   ..addAll(barItem.commandParams);
-                Tide.get<TideCommandService>().registry.executeCommand(
+                Tide.getIt<TideCommandService>().registry.executeCommand(
                     barItem.commandId!, commandParams, accessor);
               }
               setState(() {
@@ -120,6 +140,8 @@ class TideActivityBarItem extends Equatable {
     this.commandParams = const {},
     this.position = TideActivityBarItemPosition.start,
     this.selectable = true,
+    this.badgeValue,
+    this.badgeTooltip,
   }) {
     this.itemId = itemId ?? TideId.uniqueId();
   }
@@ -131,8 +153,43 @@ class TideActivityBarItem extends Equatable {
   final TideCommandParams commandParams;
   final TideActivityBarItemPosition position;
   final bool selectable;
+  final int? badgeValue;
+  final String? badgeTooltip;
 
   @override
-  List<Object?> get props =>
-      [itemId, title, icon, commandId, commandParams, position];
+  List<Object?> get props => [
+        itemId,
+        title,
+        icon,
+        commandId,
+        commandParams,
+        position,
+        selectable,
+        badgeValue,
+        badgeTooltip
+      ];
+
+  TideActivityBarItem copyWith({
+    TideId? itemId,
+    String? title,
+    IconData? icon,
+    TideId? commandId,
+    TideCommandParams? commandParams,
+    TideActivityBarItemPosition? position,
+    bool? selectable,
+    int? badgeValue,
+    String? badgeTooltip,
+  }) {
+    return TideActivityBarItem(
+      itemId: itemId ?? this.itemId,
+      title: title ?? this.title,
+      icon: icon ?? this.icon,
+      commandId: commandId ?? this.commandId,
+      commandParams: commandParams ?? this.commandParams,
+      position: position ?? this.position,
+      selectable: selectable ?? this.selectable,
+      badgeValue: badgeValue ?? this.badgeValue,
+      badgeTooltip: badgeTooltip ?? this.badgeTooltip,
+    );
+  }
 }

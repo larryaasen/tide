@@ -39,7 +39,7 @@ void main4() {
 /// Example 5: left panel.
 void main5() {
   final _ = Tide();
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
   workbenchService.layoutService.addPanel(const TidePanel());
 
   runApp(
@@ -65,7 +65,7 @@ void main6() {
   final _ = Tide();
   final leftPanelId = TideId.uniqueId();
   final rightPanelId = TideId.uniqueId();
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
   workbenchService.layoutService.addPanel(TidePanel(panelId: leftPanelId));
   workbenchService.layoutService.addPanel(TidePanel(panelId: rightPanelId));
 
@@ -103,7 +103,7 @@ void main7() {
   final _ = Tide();
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
   workbenchService.layoutService.addPanel(TidePanel(panelId: leftPanelId));
   workbenchService.layoutService.addPanel(TidePanel(panelId: mainPanelId));
 
@@ -155,7 +155,7 @@ void main8() {
   final topPanelId = TideId.uniqueId();
   final bottomPanelId = TideId.uniqueId();
 
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
 
   workbenchService.layoutService.addPanels([
     TidePanel(panelId: leftPanelId),
@@ -225,7 +225,7 @@ void main9() {
     messageIndex++;
   });
 
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
 
   workbenchService.layoutService.addPanel(const TidePanel());
 
@@ -282,7 +282,7 @@ void main11() {
   final tide = Tide();
   tide.useServices(services: [Tide.ids.service.time]);
 
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
   workbenchService.layoutService.addActivityBarItems([
     TideActivityBarItem(title: 'Explorer', icon: Icons.file_copy_outlined),
     TideActivityBarItem(title: 'Search', icon: Icons.search_outlined),
@@ -316,7 +316,7 @@ void main12() {
   final tide = Tide();
   tide.useServices(services: [Tide.ids.service.time]);
 
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
   workbenchService.layoutService.addPanel(const TidePanel());
   workbenchService.layoutService.addActivityBarItems([
     TideActivityBarItem(
@@ -360,14 +360,14 @@ void main12() {
 void main13() {
   final tide = Tide();
   tide.useServices(services: [Tide.ids.service.keybindings]);
-  final bindings = Tide.get<TideKeybindingService>();
+  final bindings = Tide.getIt<TideKeybindingService>();
   bindings.addBinding(
     TideKeybinding(
         keySet: LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.keyC),
         commandId: Tide.ids.command.toggleStatusBarVisibility),
   );
 
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
   workbenchService.layoutService.addPanel(const TidePanel());
   workbenchService.layoutService.addActivityBarItems([
     TideActivityBarItem(
@@ -403,7 +403,7 @@ void main14() {
   final tide = Tide();
 
   tide.useServices(services: [Tide.ids.service.keybindings]);
-  final bindings = Tide.get<TideKeybindingService>();
+  final bindings = Tide.getIt<TideKeybindingService>();
   bindings.addBinding(
     TideKeybinding(
         keySet: LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.keyC),
@@ -412,7 +412,7 @@ void main14() {
 
   const togglePanelVisibility = TideId('app.command.toggleLeftPanelVisibility');
 
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
   final leftPanelId = TideId.uniqueId();
   workbenchService.layoutService.addPanel(TidePanel(panelId: leftPanelId));
   workbenchService.layoutService.addActivityBarItems([
@@ -460,7 +460,7 @@ void main15() {
   tide.useServices(
       services: [Tide.ids.service.keybindings, Tide.ids.service.time]);
 
-  final bindings = Tide.get<TideKeybindingService>();
+  final bindings = Tide.getIt<TideKeybindingService>();
   bindings.addBinding(
     TideKeybinding(
         keySet: LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.keyC),
@@ -469,7 +469,7 @@ void main15() {
 
   const togglePanelVisibility = TideId('app.command.toggleLeftPanelVisibility');
 
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
   workbenchService.layoutService.addPanels([
     TidePanel(panelId: leftPanelId),
     TidePanel(panelId: mainPanelId),
@@ -612,7 +612,7 @@ class MyCalendarExtension extends TideExtension {
       use24HourFormat: true,
     ));
 
-    final bindings = Tide.get<TideKeybindingService>();
+    final bindings = Tide.getIt<TideKeybindingService>();
     bindings.addBinding(
       TideKeybinding(
           keySet:
@@ -627,7 +627,7 @@ void main17() {
   final _ = Tide();
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
   workbenchService.layoutService.addPanel(TidePanel(panelId: leftPanelId));
   workbenchService.layoutService.addPanel(TidePanel(panelId: mainPanelId));
 
@@ -703,7 +703,7 @@ void main18() {
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();
 
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
   workbenchService.layoutService.addPanels([
     TidePanel(panelId: leftPanelId),
     TidePanel(panelId: mainPanelId),
@@ -788,7 +788,7 @@ void main18() {
   tide.workbenchService.layoutService.addStatusBarItem(TideStatusBarItemText(
     position: TideStatusBarItemPosition.right,
     onPressed: (BuildContext context, TideStatusBarItem item) {
-      final notificationService = Tide.get<TideNotificationService>();
+      final notificationService = Tide.getIt<TideNotificationService>();
       final notification = TideNotification(
           message: 'Flutter: Hot reloading...',
           severity: TideNotificationSeverity.info,
@@ -815,10 +815,10 @@ void main18() {
     position: TideStatusBarItemPosition.right,
     tooltip: 'The current time',
     onPressed: (BuildContext context, TideStatusBarItem item) {
-      final notificationService = Tide.get<TideNotificationService>();
+      final notificationService = Tide.getIt<TideNotificationService>();
       if (timeNotification == null ||
           !notificationService.notificationExists(timeNotification!.id)) {
-        final timeService = Tide.get<TideTimeService>();
+        final timeService = Tide.getIt<TideTimeService>();
         final msg =
             'The time is: ${timeService.currentTimeState.timeFormatted()}';
         timeNotification =
@@ -890,7 +890,7 @@ void main() {
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();
 
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
 
   // Add panels: left and main
   workbenchService.layoutService.addPanels([
@@ -952,10 +952,10 @@ void main() {
     position: TideStatusBarItemPosition.right,
     tooltip: 'The current time',
     onPressed: (BuildContext context, TideStatusBarItem item) {
-      final notificationService = Tide.get<TideNotificationService>();
+      final notificationService = Tide.getIt<TideNotificationService>();
       if (timeNotification == null ||
           !notificationService.notificationExists(timeNotification!.id)) {
-        final timeService = Tide.get<TideTimeService>();
+        final timeService = Tide.getIt<TideTimeService>();
         final msg =
             'The time is: ${timeService.currentTimeState.timeFormatted()}';
         timeNotification =
@@ -1054,7 +1054,7 @@ void main20() {
                       prompt: 'Please provide a new branch name',
                       onDidAccept: (String value) {
                         final notificationService =
-                            Tide.get<TideNotificationService>();
+                            Tide.getIt<TideNotificationService>();
                         notificationService.info('Created branch name: $value');
                       },
                     );
@@ -1115,7 +1115,7 @@ void main21() {
                       ],
                       onDidAccept: (TideQuickPickItem item) {
                         final notificationService =
-                            Tide.get<TideNotificationService>();
+                            Tide.getIt<TideNotificationService>();
                         notificationService.info('Selected: ${item.label}');
                       },
                     );
@@ -1131,7 +1131,7 @@ void main21() {
 }
 
 void addAbout(Tide tide) {
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
 
   const aboutCommandId = TideId('app.command.about');
   Tide.registerCommandContribution(
@@ -1147,7 +1147,7 @@ void addAbout(Tide tide) {
   ]);
 
   tide.useServices(services: [Tide.ids.service.keybindings]);
-  final bindings = Tide.get<TideKeybindingService>();
+  final bindings = Tide.getIt<TideKeybindingService>();
   bindings.addBinding(
     TideKeybinding(
         keySet: LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.keyA),

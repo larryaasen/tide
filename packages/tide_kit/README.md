@@ -7,7 +7,7 @@
 
 Tide Kit is a toolkit for building IDE and studio like apps on all platforms using Flutter.
 
-![Screenshot](doc/tide_example_3.png)
+<img src="doc/tide_example_3.png" width="600">
 
 # Build tools faster
 
@@ -78,7 +78,8 @@ void main() {
 ```
 
 When running this code on macOS you should see a window like this:
-![Screenshot](doc/tide_example_1.png)
+<img src="doc/tide_example_1.png" width="600">
+
 
 Note that the use of `TideApp` is optional and does not affect the functionality of the Tide app.
 It is provided as a convenience to help you get started with your app.
@@ -122,7 +123,7 @@ void main() {
   );
 }
 ```
-![Screenshot](doc/tide_example_2.png)
+<img src="doc/tide_example_2.png" width="600">
 
 ### Example 3
 Here is a more extensive example with left and right panels, activity bar, and a few status bar items.
@@ -309,10 +310,10 @@ void main() {
   );
 }
 ```
-![Screenshot](doc/tide_example_3.png)
+<img src="doc/tide_example_3.png" width="600">
 
 ### Example 4
-![Screenshot](doc/tide_example_4.png)
+<img src="doc/tide_example_4.png" width="600">
 
 ### Command Contribution Example
 Here is an example that demonstrates how to register a custom command contribution that displays the About dialog from an activity bar item.
@@ -366,18 +367,24 @@ class AboutDialogContribution extends TideCommandContribution {
 
 
 ### Search Example
-For the code for example 5, look at [example2/lib/main.dart](https://github.com/larryaasen/tide/tree/main/packages/tide_kit/example2/lib/main.dart) and [example2/lib/spotify_tide_extension.dart](https://github.com/larryaasen/tide/tree/main/packages/tide_kit/example2/lib/spotify_tide_extension.dart)
+For the search example code, look at [example2/lib/main.dart](https://github.com/larryaasen/tide/tree/main/packages/tide_kit/example2/lib/main.dart) and [example2/lib/spotify_tide_extension.dart](https://github.com/larryaasen/tide/tree/main/packages/tide_kit/example2/lib/spotify_tide_extension.dart)
 
-![Screenshot](doc/tide_example_5.png)
+<img src="doc/tide_example_5.png" width="600">
 
 ### Spotify Example
-![Screenshot](doc/tide_example_6.png)
+Here is an example with an activity bar, a status bar, and a search panel with a custom `TideExtension`
+for Spotify. The Favorites activity bar item shows an optional badge `TideBadge`.
+When running this code on macOS you should see a window like this:
+
+<img src="doc/tide_example_6.png" width="600">
 
 ### Quick Input
 
 Use `TideQuickInputBox` as a way to gather user input fron a `TextField`. It is a generic prompt
 to allow a user to enter text.
-![Screenshot](doc/tide_example_7.png)
+
+<img src="doc/tide_example_7.png" width="600">
+
 ```dart
   ...
   onPressed: (BuildContext context, item) {
@@ -396,7 +403,9 @@ to allow a user to enter text.
 ```
 
 Use `TideQuickPick` as a way to gather user input from a list of items. The user can filter the list by entering text into the text field. The list supports up and down arrow movement to highlight specific rows, and the highlighted item can be selectced by clicking or the hitting the Enter/Return key.
-![Screenshot](doc/tide_example_8.png)
+
+<img src="doc/tide_example_8.png" width="600">
+
 ```dart
   ...
   onPressed: (BuildContext context, item) {

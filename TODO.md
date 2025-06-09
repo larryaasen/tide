@@ -9,6 +9,7 @@
 ## Activity Bar
 
 - Add support for multiple activity bars.
+- Add support for badging.
 
 ## Content Panel
 

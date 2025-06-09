@@ -1,10 +1,11 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 import '../activity_bar/tide_activity_bar.dart';
 import '../status_bar/tide_status_bar_item.dart';
 import '../tide.dart';
 import '../tide_core.dart';
+import '../widgets/tide_badge.dart';
 
 class TideActivityBarState extends Equatable {
   const TideActivityBarState({this.isVisible = true, this.items = const []});
@@ -132,10 +133,22 @@ class TideWorkbenchLayoutState extends Equatable {
   }
 }
 
+typedef TideActivityBarBadgeBuilder = Widget Function(
+    BuildContext context, TideActivityBarItem item);
+
 class TideWorkbenchLayoutService {
-  TideWorkbenchLayoutService({required this.accessor});
+  TideWorkbenchLayoutService({required this.accessor}) {
+    activityBarBadgeBuilder =
+        ((BuildContext context, TideActivityBarItem barItem) =>
+            TideBadge(badgeValue: barItem.badgeValue ?? 0));
+  }
 
   final TideServicesAccessor accessor;
+
+  /// A builder for the activity bar badge. The [TideWorkbenchLayoutService]
+  /// already provides a default implementation that returns [TideBadge].
+  /// This builder will only be called when the badge value is not null.
+  late TideActivityBarBadgeBuilder activityBarBadgeBuilder;
 
   final state = ValueNotifier(const TideWorkbenchLayoutState());
 
@@ -233,6 +246,23 @@ extension TideWorkbenchLayoutServiceActivityBar on TideWorkbenchLayoutService {
     for (final item in items) {
       addActivityBarItem(item);
     }
+  }
+
+  /// Get an activity bar item by its ID.
+  TideActivityBarItem? activityBarItem(TideId itemId) {
+    final currentState = state.value;
+    return currentState.activityBar.getItem(itemId);
+  }
+
+  /// Replace an existing activity bar item with a new one.
+  void replaceActivityBarItem(TideActivityBarItem newItem) {
+    final currentState = state.value;
+    final index = currentState.activityBar.getItemIndex(newItem.itemId);
+    final newList =
+        List<TideActivityBarItem>.from(currentState.activityBar.items)
+          ..[index] = newItem;
+    updateState(currentState.copyWith(
+        activityBar: currentState.activityBar.copyWith(items: newList)));
   }
 }
 

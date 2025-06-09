@@ -27,7 +27,7 @@ class TideWorkbench extends StatelessWidget {
   }) {
     Tide.log("Tide: TideWorkbench created");
 
-    if (!Tide.get.isRegistered<TideWorkbenchService>()) {
+    if (!Tide.getIt.isRegistered<TideWorkbenchService>()) {
       throw Exception('TideWorkbenchService is not registered.');
     }
   }
@@ -37,7 +37,8 @@ class TideWorkbench extends StatelessWidget {
   final TideStatusBar? statusBar;
   final Color backgroudColor;
 
-  TideWorkbenchService get workbenchService => Tide.get<TideWorkbenchService>();
+  TideWorkbenchService get workbenchService =>
+      Tide.getIt<TideWorkbenchService>();
 
   @override
   Widget build(BuildContext context) {
@@ -134,9 +135,10 @@ class TideWorkbench extends StatelessWidget {
             })
         : null;
 
-    final notificationService = Tide.get.isRegistered<TideNotificationService>()
-        ? Tide.get<TideNotificationService>()
-        : null;
+    final notificationService =
+        Tide.getIt.isRegistered<TideNotificationService>()
+            ? Tide.getIt<TideNotificationService>()
+            : null;
 
     final outer = Column(
       mainAxisSize: MainAxisSize.min,
@@ -161,7 +163,7 @@ class TideWorkbench extends StatelessWidget {
     );
 
     // Wrap the content with TideKeyboardListener
-    content = Tide.get.isRegistered<TideKeybindingService>() == true
+    content = Tide.getIt.isRegistered<TideKeybindingService>() == true
         ? TideKeyboardListener(
             accessor: workbenchService.accessor, child: content)
         : content;

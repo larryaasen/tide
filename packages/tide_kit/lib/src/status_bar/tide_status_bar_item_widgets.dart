@@ -227,7 +227,7 @@ class TideStatusBarItemTimeWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     TideTimeService? timeService;
     try {
-      timeService = Tide.get<TideTimeService>();
+      timeService = Tide.getIt<TideTimeService>();
     } catch (e) {
       Tide.log(
           'The TideTimeService is not registered. Did you forget to initialize the service?\n'
