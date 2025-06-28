@@ -3,19 +3,20 @@ import 'package:flutter/material.dart';
 import '../activity_bar/tide_activity_bar.dart';
 import '../notifications/tide_notification_center.dart';
 import '../notifications/tide_notifications.dart';
+import '../panels/tide_panel.dart';
 import '../services/tide_keybinding_service.dart';
 import '../services/tide_workbench_layout_service.dart';
 import '../services/tide_workbench_service.dart';
 import '../status_bar/tide_status_bar.dart';
 import '../tide.dart';
-import '../tide_core.dart';
+import 'tide_panel_area.dart';
 import 'tide_panel_widget.dart';
 import 'tide_workbench_accessor.dart';
 
 typedef TidePanelBuilder = TidePanelWidget? Function(
     BuildContext context, TidePanel panel);
 
-/// A workbench is the main widget that contains the activity bar, panels, and status bar. It is a
+/// A workbench is the main widget that contains the activity bar, panel area, and status bar. It is a
 /// child of the [TideWindow] widget.
 class TideWorkbench extends StatelessWidget {
   TideWorkbench({
@@ -42,72 +43,32 @@ class TideWorkbench extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final layoutService =
+        workbenchService.accessor.get<TideWorkbenchLayoutService>();
     return ValueListenableBuilder<TideWorkbenchLayoutState>(
       valueListenable:
           workbenchService.accessor.get<TideWorkbenchLayoutService>().state,
       builder: (context, state, child) {
-        return _buildInternal(context, state);
+        return _buildInternal(context, state, layoutService);
       },
     );
   }
 
-  Widget _buildInternal(BuildContext context, TideWorkbenchLayoutState state) {
+  Widget _buildInternal(BuildContext context, TideWorkbenchLayoutState state,
+      TideWorkbenchLayoutService layoutService) {
     // Get the activity bar widget
     TideActivityBar? activityBarWidget;
-    if (activityBar != null && state.activityBar.isVisible) {
+    if (activityBar != null && layoutService.activityBarState.value.isVisible) {
       activityBarWidget = activityBar;
     }
 
-    final panels = state.panels;
-    List<TidePanelWidget> builtPanels = [];
-
-    // Remove the non-visible panels
-    final visiblePanels = panels.where((panel) => panel.isVisible).toList();
-
-    // Build the panels
-    builtPanels = visiblePanels.map((panel) {
-      if (panel.panelBuilder != null) {
-        return panel.panelBuilder!(context, panel) ?? const TidePanelWidget();
-      }
-      assert(panelBuilder != null);
-      return panelBuilder!(context, panel) ?? const TidePanelWidget();
-    }).toList();
-
-    final leftSide = builtPanels
-        .where((panel) => panel.position == TidePosition.left)
-        .toList();
-    final center = builtPanels
-        .where((panel) => panel.position == TidePosition.center)
-        .toList();
-    final rightSide = builtPanels
-        .where((panel) => panel.position == TidePosition.right)
-        .toList();
-    final top = builtPanels
-        .where((panel) => panel.position == TidePosition.top)
-        .toList();
-    final bottom = builtPanels
-        .where((panel) => panel.position == TidePosition.bottom)
-        .toList();
-
-    final centerWidgets = center.isEmpty ? [const Spacer()] : center;
-
-    final mergedPanels = [...leftSide, ...centerWidgets, ...rightSide];
-    final allPanels = mergedPanels.map((widget) {
-      if (widget is TidePanelWidget) {
-        if (widget.expanded) {
-          return Expanded(child: widget);
-        }
-      }
-      return widget;
-    }).toList();
-
-    final inner = Column(
-      children: [
-        ...top,
-        Expanded(child: Row(children: allPanels)),
-        ...bottom,
-      ],
-    );
+    // Build the panel area.
+    // final panelArea =
+    //     TidePanelAreaOld(panels: state.panels, panelBuilder: panelBuilder);
+    final panelArea = TidePanelArea(
+        rootNode: state.rootNode,
+        panelBuilder: panelBuilder,
+        layoutService: layoutService);
 
     final main = Column(
       children: [
@@ -115,7 +76,7 @@ class TideWorkbench extends StatelessWidget {
           child: Row(
             children: [
               if (activityBarWidget != null) activityBarWidget,
-              Expanded(child: inner),
+              Expanded(child: panelArea),
             ],
           ),
         ),

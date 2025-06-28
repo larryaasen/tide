@@ -2,8 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 
 import '../activity_bar/tide_activity_bar.dart';
+import '../panels/tide_panel.dart';
 import '../status_bar/tide_status_bar_item.dart';
-import '../tide.dart';
 import '../tide_core.dart';
 import '../widgets/tide_badge.dart';
 
@@ -90,16 +90,16 @@ class TideStatusBarState extends Equatable {
 }
 
 class TideWorkbenchLayoutState extends Equatable {
-  const TideWorkbenchLayoutState({
-    this.activityBar = const TideActivityBarState(),
+  TideWorkbenchLayoutState({
     this.panels = const [],
-  });
+    TidePanelNode? rootNode,
+  }) : rootNode = rootNode ?? TidePanelNodeLeaf();
 
-  final TideActivityBarState activityBar;
   final List<TidePanel> panels;
+  final TidePanelNode rootNode;
 
   @override
-  List<Object?> get props => [activityBar, panels];
+  List<Object?> get props => [panels, rootNode];
 
   TidePanel? getPanel(TideId panelId) {
     if (panelId.id.isEmpty && panels.length == 1) {
@@ -123,12 +123,12 @@ class TideWorkbenchLayoutState extends Equatable {
   }
 
   TideWorkbenchLayoutState copyWith({
-    TideActivityBarState? activityBar,
     List<TidePanel>? panels,
+    TidePanelNode? rootNode,
   }) {
     return TideWorkbenchLayoutState(
-      activityBar: activityBar ?? this.activityBar,
       panels: panels ?? this.panels,
+      rootNode: rootNode ?? this.rootNode,
     );
   }
 }
@@ -150,16 +150,26 @@ class TideWorkbenchLayoutService {
   /// This builder will only be called when the badge value is not null.
   late TideActivityBarBadgeBuilder activityBarBadgeBuilder;
 
-  final state = ValueNotifier(const TideWorkbenchLayoutState());
-
+  final state = ValueNotifier(TideWorkbenchLayoutState());
   final statusBarState = ValueNotifier(const TideStatusBarState());
+  final activityBarState = ValueNotifier(const TideActivityBarState());
 
   void updateState(TideWorkbenchLayoutState newState) {
     state.value = newState;
   }
 
+  void updateActivityBarState(TideActivityBarState newState) {
+    activityBarState.value = newState;
+  }
+
   void updateStatusBarState(TideStatusBarState newState) {
     statusBarState.value = newState;
+  }
+
+  /// The root node of the panel node tree.
+  TidePanelNode get rootNode => state.value.rootNode;
+  set rootNode(TidePanelNode node) {
+    updateState(state.value.copyWith(rootNode: node));
   }
 }
 
@@ -203,6 +213,7 @@ extension TideWorkbenchLayoutServicePanels on TideWorkbenchLayoutService {
     updateState(currentState.copyWith(panels: newList));
   }
 
+  @Deprecated('Use layoutService.rootNode')
   void addPanels(List<TidePanel> panels) {
     for (final panel in panels) {
       addPanel(panel);
@@ -216,30 +227,49 @@ extension TideWorkbenchLayoutServicePanels on TideWorkbenchLayoutService {
       ..[index] = newPanel;
     updateState(currentState.copyWith(panels: newList));
   }
+
+  void replaceNode(TidePanelNode newNode) {
+    final currentState = state.value;
+
+    TidePanelNode replace(TidePanelNode node) {
+      if (node.nodeId == newNode.nodeId) {
+        return newNode;
+      }
+      if (node is TidePanelNodePair) {
+        return node.copyWith(
+          start: replace(node.start),
+          end: replace(node.end),
+        );
+      }
+      return node;
+    }
+
+    final updatedRoot = replace(currentState.rootNode);
+    updateState(currentState.copyWith(rootNode: updatedRoot));
+  }
 }
 
 extension TideWorkbenchLayoutServiceActivityBar on TideWorkbenchLayoutService {
   /// Get the activity bar visibility.
-  bool getActivityBarVisible() => state.value.activityBar.isVisible;
+  bool getActivityBarVisible() => activityBarState.value.isVisible;
 
   /// Set the activity bar visibility.
   void setActivtyBarVisible(bool visible) {
-    final currentState = state.value;
-    final newBar = currentState.activityBar.copyWith(isVisible: visible);
-    updateState(currentState.copyWith(activityBar: newBar));
+    final currentState = activityBarState.value;
+    final newBar = currentState.copyWith(isVisible: visible);
+    updateActivityBarState(newBar);
   }
 
   void addActivityBarItem(TideActivityBarItem newItem) {
-    final currentState = state.value;
-    if (currentState.activityBar.getItem(newItem.itemId) != null) {
+    final currentState = activityBarState.value;
+    if (currentState.getItem(newItem.itemId) != null) {
       throw ArgumentError(
           'Tide: TideWorkbenchLayoutService.addActivityBarItem itemId already exists');
     }
-    final newList =
-        List<TideActivityBarItem>.from(currentState.activityBar.items)
-          ..add(newItem);
-    final newBar = currentState.activityBar.copyWith(items: newList);
-    updateState(currentState.copyWith(activityBar: newBar));
+    final newList = List<TideActivityBarItem>.from(currentState.items)
+      ..add(newItem);
+    final newBar = currentState.copyWith(items: newList);
+    updateActivityBarState(newBar);
   }
 
   void addActivityBarItems(List<TideActivityBarItem> items) {
@@ -250,19 +280,16 @@ extension TideWorkbenchLayoutServiceActivityBar on TideWorkbenchLayoutService {
 
   /// Get an activity bar item by its ID.
   TideActivityBarItem? activityBarItem(TideId itemId) {
-    final currentState = state.value;
-    return currentState.activityBar.getItem(itemId);
+    return activityBarState.value.getItem(itemId);
   }
 
   /// Replace an existing activity bar item with a new one.
   void replaceActivityBarItem(TideActivityBarItem newItem) {
-    final currentState = state.value;
-    final index = currentState.activityBar.getItemIndex(newItem.itemId);
-    final newList =
-        List<TideActivityBarItem>.from(currentState.activityBar.items)
-          ..[index] = newItem;
-    updateState(currentState.copyWith(
-        activityBar: currentState.activityBar.copyWith(items: newList)));
+    final currentState = activityBarState.value;
+    final index = currentState.getItemIndex(newItem.itemId);
+    final newList = List<TideActivityBarItem>.from(currentState.items)
+      ..[index] = newItem;
+    updateActivityBarState(currentState.copyWith(items: newList));
   }
 }
 

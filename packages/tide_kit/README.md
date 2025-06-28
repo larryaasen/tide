@@ -39,7 +39,9 @@ This section defines key concepts of Tide Kit.
 
 **Notification**: A notification is a rich interactive message that is briefly displayed over the workbench.
 
-**Panel**: A panel is part of a workbench and displays the content.
+**Panel**: A panel is part of a workbench that displays content.
+
+**Panel Area**: All of the panels inside the workbench are arranged in the panel area. Panels can be grouped together to form a tabbed panel.
 
 **Quick Input**:  A way to gather user input, either by entering text or selecting an option from a list.
 
@@ -55,7 +57,7 @@ This section defines key concepts of Tide Kit.
 
 **Window**: A window is a top-level widget that contains a workbench.
 
-**Workbench**: A workbench is the main widget that contains the activity bar, panels, and status bar. It is a child of the window.
+**Workbench**: A workbench is the main widget that contains the activity bar, panel area, and status bar. It is a child of the window.
 
 # Getting started
 
@@ -311,6 +313,28 @@ void main() {
 }
 ```
 <img src="doc/tide_example_3.png" width="600">
+
+### Upgrading from 1.6.0 or below
+
+If you are upgrading panels from version 1.6.0 or below, here is how things were changed.
+
+**Previous way to add a panel**
+```dart
+  workbenchService.layoutService.addPanel(TidePanel(panelId: leftPanelId));
+  workbenchService.layoutService.addPanel(TidePanel(panelId: rightPanelId));
+```
+
+**Current way to add a panel**
+```dart
+  workbenchService.layoutService.rootNode = TidePanelNodePair(
+    start: TidePanelNodeLeaf(panels: [
+      TidePanel(panelId: leftPanelId, isVisible: true),
+    ]),
+    end: TidePanelNodeLeaf(panels: [
+      TidePanel(panelId: rightPanelId, isVisible: true),
+    ]),
+  );
+```
 
 ### Example 4
 <img src="doc/tide_example_4.png" width="600">

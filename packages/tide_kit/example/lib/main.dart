@@ -69,6 +69,14 @@ void main6() {
   workbenchService.layoutService.addPanel(TidePanel(panelId: leftPanelId));
   workbenchService.layoutService.addPanel(TidePanel(panelId: rightPanelId));
 
+  workbenchService.layoutService.rootNode = TidePanelNodePair(
+    start: TidePanelNodeLeaf(panels: [TidePanel(panelId: leftPanelId)]),
+    end: TidePanelNodePair(
+      start: TidePanelNodeLeaf(panels: const []),
+      end: TidePanelNodeLeaf(panels: [TidePanel(panelId: rightPanelId)]),
+    ),
+  );
+
   runApp(
     TideApp(
       home: TideWindow(
@@ -147,7 +155,7 @@ void main7() {
 }
 
 /// Example 8: left, middle, right, top, bottom panels, and status bar.
-void main8() {
+void main() {
   final _ = Tide();
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();
@@ -164,6 +172,24 @@ void main8() {
     TidePanel(panelId: topPanelId),
     TidePanel(panelId: bottomPanelId),
   ]);
+
+  workbenchService.layoutService.rootNode = TidePanelNodePair(
+    orientation: TideOrientation.vertical,
+    start: TidePanelNodeLeaf(panels: [TidePanel(panelId: topPanelId)]),
+    // end: TidePanelNodeLeaf(panels: [TidePanel(panelId: bottomPanelId)]),
+    end: TidePanelNodePair(
+      orientation: TideOrientation.vertical,
+      start: TidePanelNodePair(
+        orientation: TideOrientation.horizontal,
+        start: TidePanelNodeLeaf(panels: [TidePanel(panelId: leftPanelId)]),
+        end: TidePanelNodePair(
+          start: TidePanelNodeLeaf(panels: [TidePanel(panelId: mainPanelId)]),
+          end: TidePanelNodeLeaf(panels: [TidePanel(panelId: rightPanelId)]),
+        ),
+      ),
+      end: TidePanelNodeLeaf(panels: [TidePanel(panelId: bottomPanelId)]),
+    ),
+  );
 
   runApp(
     TideApp(
@@ -502,7 +528,7 @@ void main15() {
                 position: TidePosition.left,
                 resizeSide: TidePosition.right,
                 minWidth: 100,
-                maxWidth: 450,
+                // maxWidth: 450,
                 initialWidth: 220,
                 child: const TideCalendarDayPane(),
               );
@@ -511,6 +537,7 @@ void main15() {
                 backgroundColor: Colors.white,
                 expanded: true,
                 position: TidePosition.center,
+                minWidth: 100,
                 child: Container(
                     height: double.infinity,
                     padding: const EdgeInsets.all(16.0),
@@ -879,7 +906,7 @@ void main18() {
 }
 
 /// Example 19: An activity bar with four items, and a status bar with a spinner, time, and notifications.
-void main() {
+void main19() {
   final tide = Tide();
 
   tide.useServices(services: [

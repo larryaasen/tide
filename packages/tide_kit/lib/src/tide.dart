@@ -1,4 +1,3 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -11,7 +10,6 @@ import 'services/tide_keybinding_service.dart';
 import 'services/tide_time_service.dart';
 import 'services/tide_workbench_service.dart';
 import 'tide_core.dart';
-import 'widgets/tide_workbench.dart';
 
 /*
   Here are the Tide UI components.
@@ -29,51 +27,6 @@ import 'widgets/tide_workbench.dart';
         - TidePanel
 
 */
-
-/// A panel is part of a workbench and displays the content. A [TidePanel] is a
-///  model for a workbench panel. Panels are displayed using a [TidePanelWidget].
-class TidePanel extends Equatable {
-  /// Creates a panel is part of a workbench and displays the content.
-  const TidePanel({
-    this.panelId = TideId.empty,
-    this.isVisible = true,
-    // this.initialWidth = 200.0,
-    this.panelBuilder,
-  });
-
-  final TideId panelId;
-  final bool isVisible;
-  // final double initialWidth;
-  final TidePanelBuilder? panelBuilder;
-
-  // final Color backgroundColor;
-  // final TidePosition position;
-  // final double? height;
-  // final bool expanded;
-  // final TidePosition? resizeSide;
-
-  @override
-  List<Object?> get props => [
-        panelId,
-        isVisible,
-        // initialWidth,
-        panelBuilder,
-      ];
-
-  TidePanel copyWith({
-    TideId? panelId,
-    bool? isVisible,
-    // double? initialWidth,
-    TidePanelBuilder? panelBuilder,
-  }) {
-    return TidePanel(
-      panelId: panelId ?? this.panelId,
-      isVisible: isVisible ?? this.isVisible,
-      // initialWidth: initialWidth ?? this.initialWidth,
-      panelBuilder: panelBuilder ?? this.panelBuilder,
-    );
-  }
-}
 
 /// The logging servcie is used to log messages to be displayed in the console.
 class TideLoggingService {

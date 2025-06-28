@@ -6,6 +6,7 @@ export 'src/commands/tide_command.dart';
 export 'src/commands/tide_contributions.dart';
 export 'src/notifications/tide_notification_center.dart';
 export 'src/notifications/tide_notifications.dart';
+export 'src/panels/tide_panel.dart';
 export 'src/services/tide_command_service.dart';
 export 'src/services/tide_keybinding_service.dart';
 export 'src/services/tide_time_service.dart';

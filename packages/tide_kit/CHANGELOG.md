@@ -1,3 +1,8 @@
+## 2.0.0
+
+- Activity Bar state moved
+- Panel layout
+
 ## 1.6.0
 
 - Added an optional badge to an activity bar item.

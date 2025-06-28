@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../tide_core.dart';
-import '../tide_resizer.dart';
 
 class TidePanelWidget extends StatelessWidget {
   const TidePanelWidget({
@@ -30,18 +29,19 @@ class TidePanelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final content = resizeSide != null && child != null
-        ? TideResizer(
-            resizeSide: resizeSide!,
-            minWidth: minWidth,
-            maxWidth: maxWidth,
-            initialWidth: initialWidth,
-            child: child!)
-        : child;
+    // final content = resizeSide != null && child != null
+    //     ? TideResizer(
+    //         resizeSide: resizeSide!,
+    //         minWidth: minWidth,
+    //         maxWidth: maxWidth,
+    //         initialWidth: initialWidth,
+    //         child: child!)
+    //     : ConstrainedBox(
+    //         constraints: BoxConstraints(minWidth: minWidth), child: child);
 
     return Container(
       color: backgroundColor,
-      child: content,
+      child: child,
     );
   }
 }

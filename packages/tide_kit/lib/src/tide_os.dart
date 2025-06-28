@@ -213,6 +213,7 @@ class MockUpgraderOS extends UpgraderOS {
 }
 
 /// A class that indicates which OS this code is running on.
+/// /// TODO: This class should be an add on and not part of the core Tide package.
 class TideOS {
   final upgrader = UpgraderOS();
 

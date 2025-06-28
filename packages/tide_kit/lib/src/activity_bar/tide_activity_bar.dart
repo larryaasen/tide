@@ -37,11 +37,12 @@ class _TideActivityBarState extends State<TideActivityBar> {
   @override
   Widget build(BuildContext context) {
     final workbenchService = Tide.getIt<TideWorkbenchService>();
-    return ValueListenableBuilder<TideWorkbenchLayoutState>(
-      valueListenable:
-          workbenchService.accessor.get<TideWorkbenchLayoutService>().state,
+    return ValueListenableBuilder<TideActivityBarState>(
+      valueListenable: workbenchService.accessor
+          .get<TideWorkbenchLayoutService>()
+          .activityBarState,
       builder: (context, state, child) {
-        return _buildInternal(context, state.activityBar,
+        return _buildInternal(context, state,
             workbenchService.accessor.get<TideWorkbenchLayoutService>());
       },
     );
