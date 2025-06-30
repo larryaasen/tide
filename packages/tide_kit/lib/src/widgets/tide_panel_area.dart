@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../panels/tide_panel.dart';
 import '../services/tide_workbench_layout_service.dart';
-import '../tide_core.dart';
+import '../tide_sash.dart';
 import 'tide_panel_widget.dart';
 import 'tide_workbench.dart';
 
@@ -56,29 +56,17 @@ class TidePanelArea extends StatelessWidget {
   }
 
   Widget _buildSplitContainer(BuildContext context, TidePanelNodePair node) {
-    const sashWidth = 4;
-    const borderDimension = 1.0;
-    final isVertical = node.orientation == TideOrientation.horizontal;
-
     // Build the sash to use for each panel. It is added to the end of the start
     // panel and the start of the end panel, combined to make one sash.
-    final sash = _buildSash(context, node, isVertical,
-        dimension: sashWidth / 2, borderDimension: borderDimension / 2);
-
-    // TideResizerWidget(
-    //     isVertical: isVertical,
-    //     showMouseCursorOnResizer: node.showMouseCursorOnResizer,
-    //     onUpdated: (delta) => _handleResizerDrag(context, node, delta,
-    //         isVertical),
-    //   )
+    final sash = _buildSash(context, node);
 
     final startPanelNode = _buildPanelNode(context, node.start);
     final startChildren = [
       Expanded(child: startPanelNode),
-      _border(isVertical: isVertical, borderDimension: borderDimension)
+      _border(isVertical: node.isSashVertical)
     ];
     final startNode = node.showBorderBetweenNodes
-        ? isVertical
+        ? node.isSashVertical
             ? Row(children: startChildren)
             : Column(children: startChildren)
         : startPanelNode;
@@ -89,9 +77,9 @@ class TidePanelArea extends StatelessWidget {
         startNode,
         if (sash != null)
           Positioned(
-              left: isVertical ? null : 0,
+              left: node.isSashVertical ? null : 0,
               right: 0,
-              top: isVertical ? 0 : null,
+              top: node.isSashVertical ? 0 : null,
               bottom: 0,
               child: sash)
       ]),
@@ -104,21 +92,24 @@ class TidePanelArea extends StatelessWidget {
         if (sash != null)
           Positioned(
               left: 0,
-              right: isVertical ? null : 0,
-              top: isVertical ? 0 : null,
-              bottom: isVertical ? 0 : null,
+              right: node.isSashVertical ? null : 0,
+              top: node.isSashVertical ? 0 : null,
+              bottom: node.isSashVertical ? 0 : null,
               child: sash)
       ]),
     );
 
     final children = [start, end];
-    final nodes =
-        isVertical ? Row(children: children) : Column(children: children);
+    final nodes = node.isSashVertical
+        ? Row(children: children)
+        : Column(children: children);
 
     return nodes;
   }
 
-  Widget _border({required bool isVertical, required double borderDimension}) {
+  Widget _border({required bool isVertical}) {
+    const borderDimension = 1.0;
+
     return Container(
       width: isVertical ? borderDimension : null,
       height: isVertical ? null : borderDimension,
@@ -127,135 +118,32 @@ class TidePanelArea extends StatelessWidget {
   }
 
   Widget? _buildSash(
-      BuildContext context, TidePanelNodePair node, bool isVertical,
-      {required double dimension, required double borderDimension}) {
+      BuildContext contextSplitContainer, TidePanelNodePair node) {
     if (!node.useSash && !node.showBorderBetweenNodes) return null;
 
-    // TideResizer();
-    final sash = GestureDetector(
-      onPanUpdate: (details) =>
-          _handleSashDrag(context, node, details.delta, isVertical),
-      child: MouseRegion(
-        cursor: node.showMouseCursorOnSash
-            ? isVertical
-                ? SystemMouseCursors.resizeColumn
-                : SystemMouseCursors.resizeRow
-            : MouseCursor.defer,
-        child: SizedBox(
-          width: isVertical ? dimension : null,
-          height: isVertical ? null : dimension,
-        ),
-      ),
-    );
+    const sashWidth = 4;
 
-    // if (border != null) {
-    //   final alignment = isVertical
-    //       ? Alignment.centerLeft
-    //       : Alignment.centerRight; // Align the border to the left or right
-    //   return Stack(
-    //     children: [
-    //       // Positioned.fill(
-    //       //     right: 0.0, child: Align(alignment: alignment, child: border)),
-    //       // Positioned.fill(child: Center(child: sash)),
-    //     ],
-    //   );
-    // }
+    final sash = TideSash(
+        node: node,
+        contextSplitContainer: contextSplitContainer,
+        dimension: sashWidth / 2,
+        onSashDrag: _handleSashDrag);
 
     return sash;
   }
 
-  void _handleSashDrag(BuildContext context, TidePanelNodePair node,
-      Offset delta, bool isVertical) {
+  void _handleSashDrag(
+      BuildContext context, TidePanelNodePair node, Offset delta) {
     final RenderBox box = context.findRenderObject() as RenderBox;
 
-    final deltaRatio =
-        isVertical ? delta.dx / box.size.width : delta.dy / box.size.height;
+    final deltaRatio = node.isSashVertical
+        ? delta.dx / box.size.width
+        : delta.dy / box.size.height;
     final newRatio = (node.splitRatio + deltaRatio).clamp(0.1, 0.9);
 
-    print("_handleSashDrag: ${delta}: $newRatio");
+    print("_handleSashDrag: $delta: $newRatio");
 
     final newNode = node.copyWith(splitRatio: newRatio);
     layoutService.replaceNode(newNode);
-  }
-}
-
-class TidePanelAreaOld extends StatelessWidget {
-  const TidePanelAreaOld({super.key, required this.panels, this.panelBuilder});
-
-  final List<TidePanel> panels;
-  final TidePanelBuilder? panelBuilder;
-
-  @override
-  Widget build(BuildContext context) {
-    List<TidePanelWidget> builtPanels = [];
-
-    // Remove the non-visible panels
-    final visiblePanels = panels.where((panel) => panel.isVisible).toList();
-
-    // Build the panels
-    builtPanels = visiblePanels.map((panel) {
-      if (panel.panelBuilder != null) {
-        return panel.panelBuilder!(context, panel) ?? const TidePanelWidget();
-      }
-      assert(panelBuilder != null);
-      return panelBuilder!(context, panel) ?? const TidePanelWidget();
-    }).toList();
-
-    final leftSide = builtPanels
-        .where((panel) => panel.position == TidePosition.left)
-        .toList();
-    final center = builtPanels
-        .where((panel) => panel.position == TidePosition.center)
-        .toList();
-    final rightSide = builtPanels
-        .where((panel) => panel.position == TidePosition.right)
-        .toList();
-    final top = builtPanels
-        .where((panel) => panel.position == TidePosition.top)
-        .toList();
-    final bottom = builtPanels
-        .where((panel) => panel.position == TidePosition.bottom)
-        .toList();
-
-    final centerWidgets = center.isEmpty ? [const Spacer()] : center;
-
-    final mergedPanels = [...leftSide, ...centerWidgets, ...rightSide];
-    final innerPanels = mergedPanels.map((widget) {
-      if (widget is TidePanelWidget) {
-        // Create a ConstrainedBox wrapper for the panel widget
-        // to enforce its minWidth and maxWidth.
-        Widget constrainedPanelWidget = ConstrainedBox(
-          constraints: BoxConstraints(
-            minWidth: widget.minWidth,
-            maxWidth: widget.maxWidth,
-          ),
-          child: widget, // The original TidePanelWidget
-        );
-
-        if (widget.expanded) {
-          // If the panel is expanded, the ConstrainedBox (which wraps the panel)
-          // becomes the child of Expanded. Expanded will try to give it space.
-          // If that space is less than minWidth, ConstrainedBox will attempt to be minWidth,
-          // potentially causing an overflow if Expanded cannot satisfy this,
-          // which is the correct Flutter behavior for insufficient space.
-          return Expanded(child: constrainedPanelWidget);
-        } else {
-          // For non-expanded panels, the ConstrainedBox directly influences
-          // the size it occupies in the Row.
-          return constrainedPanelWidget;
-        }
-      }
-      return widget; // Handles Spacer or other non-TidePanelWidget widgets
-    }).toList();
-
-    // Build the panel area.
-    final panelArea = Column(
-      children: [
-        ...top,
-        Expanded(child: Row(children: innerPanels)),
-        ...bottom,
-      ],
-    );
-    return panelArea;
   }
 }

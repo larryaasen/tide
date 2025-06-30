@@ -47,6 +47,8 @@ This section defines key concepts of Tide Kit.
 
 **Registry**: A registry is a collection of objects that can be retrieved by a class Type.
 
+**Sash**: A sash is a draggable widget with cursor that is used to resize panels in the panel area.
+
 **Service**: A service is a class that provides functionality to the system that does not have a UI.
 
 **Status bar**: A status bar is a short widget that is displayed at the bottom of a workbench and contains various items of minimal content.

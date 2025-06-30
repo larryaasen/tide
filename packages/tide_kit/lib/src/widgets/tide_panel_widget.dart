@@ -178,3 +178,20 @@ class _TideTextFieldState extends State<TideTextField> {
     );
   }
 }
+
+class TidePanelBorder extends StatelessWidget {
+  const TidePanelBorder(
+      {super.key, required this.isEdgeVertical, this.borderDimension = 1.0});
+
+  final bool isEdgeVertical;
+  final double borderDimension;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: isEdgeVertical ? borderDimension : null,
+      height: isEdgeVertical ? null : borderDimension,
+      color: Colors.grey.shade300,
+    );
+  }
+}

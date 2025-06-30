@@ -19,7 +19,7 @@ export 'src/tide.dart';
 export 'src/tide_core.dart';
 export 'src/tide_os.dart';
 export 'src/tide_quick_input.dart';
-export 'src/tide_resizer.dart';
+export 'src/tide_sash.dart';
 export 'src/widgets/tide_app.dart';
 export 'src/widgets/tide_badge.dart';
 export 'src/widgets/tide_calendar_day_pane.dart';

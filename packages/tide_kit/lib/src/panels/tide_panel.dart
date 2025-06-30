@@ -172,4 +172,6 @@ class TidePanelNodePair extends TidePanelNode {
   /// Returns true if the sash should be used. This is true when the
   /// minDimension and maxDimension are not the same.
   bool get useSash => true; // minDimension != maxDimension;
+
+  bool get isSashVertical => orientation == TideOrientation.horizontal;
 }

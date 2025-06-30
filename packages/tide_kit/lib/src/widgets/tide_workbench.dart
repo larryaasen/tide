@@ -62,9 +62,6 @@ class TideWorkbench extends StatelessWidget {
       activityBarWidget = activityBar;
     }
 
-    // Build the panel area.
-    // final panelArea =
-    //     TidePanelAreaOld(panels: state.panels, panelBuilder: panelBuilder);
     final panelArea = TidePanelArea(
         rootNode: state.rootNode,
         panelBuilder: panelBuilder,
