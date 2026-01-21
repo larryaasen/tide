@@ -63,6 +63,7 @@ class TideConsole extends StatefulWidget {
 
 class _TideConsoleState extends State<TideConsole> {
   final ScrollController _scrollController = ScrollController();
+  int _previousBufferLength = 0;
 
   @override
   void dispose() {
@@ -94,16 +95,21 @@ class _TideConsoleState extends State<TideConsole> {
                 ValueListenableBuilder<int>(
                     valueListenable: widget.loggingService.data,
                     builder: (context, value, child) {
-                      // Scroll to bottom after the frame is built
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (_scrollController.hasClients) {
-                          _scrollController.animateTo(
-                            _scrollController.position.maxScrollExtent,
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeOut,
-                          );
-                        }
-                      });
+                      final currentBufferLength = widget.loggingService.buffer.length;
+                      
+                      // Scroll to bottom only when new messages are added
+                      if (currentBufferLength > _previousBufferLength) {
+                        _previousBufferLength = currentBufferLength;
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (_scrollController.hasClients) {
+                            _scrollController.animateTo(
+                              _scrollController.position.maxScrollExtent,
+                              duration: const Duration(milliseconds: 200),
+                              curve: Curves.easeOut,
+                            );
+                          }
+                        });
+                      }
                       
                       return Expanded(
                         child: ListView.builder(
