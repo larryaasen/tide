@@ -409,6 +409,8 @@ When running this code on macOS you should see a window like this:
 Use `TideConsole` as a way to display log messages in a console panel. The console displays messages from `TideLoggingService` and updates in real-time as new messages are logged.
 
 ```dart
+import 'dart:async';
+
 void main() {
   final _ = Tide();
   final logging = TideLoggingService();
@@ -419,7 +421,7 @@ void main() {
     messageIndex++;
   });
 
-  final workbenchService = Tide.getIt<TideWorkbenchService>();
+  final workbenchService = Tide.get<TideWorkbenchService>();
 
   workbenchService.layoutService.addPanel(const TidePanel());
 
@@ -450,7 +452,7 @@ void main() {
 
 ### Quick Input
 
-Use `TideQuickInputBox` as a way to gather user input fron a `TextField`. It is a generic prompt
+Use `TideQuickInputBox` as a way to gather user input from a `TextField`. It is a generic prompt
 to allow a user to enter text.
 
 <img src="doc/tide_example_7.png" width="600">
