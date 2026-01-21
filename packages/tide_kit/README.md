@@ -401,7 +401,7 @@ void main() {
     messageIndex++;
   });
 
-  final workbenchService = Tide.get<TideWorkbenchService>();
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
 
   workbenchService.layoutService.addPanel(const TidePanel());
 

@@ -213,9 +213,6 @@ class Tide {
   /// The one [GetIt] instance for Tide level instances.
   static GetIt get getIt => _getIt;
 
-  /// Get a registered instance from the service locator.
-  static T get<T extends Object>() => _getIt<T>();
-
   /// Optional services that can be started.
   final _servicesAvailable = <String, TideCreateHandler>{};
 
