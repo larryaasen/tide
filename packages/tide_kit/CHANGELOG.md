@@ -3,6 +3,7 @@
 - Added Console example to README demonstrating the TideConsole widget with logging.
 - Fixed TideConsole autoscroll bug to properly scroll to bottom when new messages are added.
 - Updated API for consistency: use `Tide.get<T>()` instead of `Tide.getIt<T>()`.
+- Added `TidePanelNodeLeaf` and `rootNode` setter for simplified panel layout configuration.
 - Fixed documentation typos in README and code comments.
 
 ## 1.6.0
