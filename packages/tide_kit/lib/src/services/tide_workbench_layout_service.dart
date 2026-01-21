@@ -7,17 +7,6 @@ import '../tide.dart';
 import '../tide_core.dart';
 import '../widgets/tide_badge.dart';
 
-/// A node representing a leaf in the panel layout tree.
-/// This is a simple container for a list of panels.
-class TidePanelNodeLeaf extends Equatable {
-  const TidePanelNodeLeaf({required this.panels});
-
-  final List<TidePanel> panels;
-
-  @override
-  List<Object?> get props => [panels];
-}
-
 class TideActivityBarState extends Equatable {
   const TideActivityBarState({this.isVisible = true, this.items = const []});
 
@@ -164,13 +153,6 @@ class TideWorkbenchLayoutService {
   final state = ValueNotifier(const TideWorkbenchLayoutState());
 
   final statusBarState = ValueNotifier(const TideStatusBarState());
-
-  /// Set the root node of the panel layout.
-  /// This replaces all existing panels with the panels from the node.
-  set rootNode(TidePanelNodeLeaf node) {
-    final currentState = state.value;
-    updateState(currentState.copyWith(panels: node.panels));
-  }
 
   void updateState(TideWorkbenchLayoutState newState) {
     state.value = newState;
