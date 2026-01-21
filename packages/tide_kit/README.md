@@ -383,7 +383,7 @@ When running this code on macOS you should see a window like this:
 Use a console to display log messages that are generated from events or actions in your application.
 When running this code on macOS you should see a window like this:
 
-<!-- Placeholder: Screenshot will be added later -->
+<img src="doc/tide_example_9.png" width="600">
 
 ```dart
 import 'dart:async';
