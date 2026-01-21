@@ -378,9 +378,59 @@ When running this code on macOS you should see a window like this:
 
 <img src="doc/tide_example_6.png" width="600">
 
+### Console
+
+Use a console to display log messages that are generated from events or actions in your application.
+When running this code on macOS you should see a window like this:
+
+<img src="doc/tide_example_9.png" width="600">
+
+```dart
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:tide_kit/tide_kit.dart';
+
+void main() {
+  final _ = Tide();
+  final logging = TideLoggingService();
+  int messageIndex = 1;
+
+  Timer.periodic(const Duration(seconds: 1), (timer) {
+    logging.log('Message $messageIndex');
+    messageIndex++;
+  });
+
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
+
+  workbenchService.layoutService.addPanel(const TidePanel());
+
+  runApp(
+    TideApp(
+      home: TideWindow(
+        workbench: TideWorkbench(
+          panelBuilder: (context, panel) {
+            return TidePanelWidget(
+              backgroundColor: Colors.purple.shade100,
+              position: TidePosition.bottom,
+              resizeSide: TidePosition.top,
+              child: TideConsole(
+                title: 'CONSOLE',
+                loggingService: logging,
+                backgroundColor: Colors.transparent,
+              ),
+            );
+          },
+        ),
+      ),
+    ),
+  );
+}
+```
+
 ### Quick Input
 
-Use `TideQuickInputBox` as a way to gather user input fron a `TextField`. It is a generic prompt
+Use `TideQuickInputBox` as a way to gather user input from a `TextField`. It is a generic prompt
 to allow a user to enter text.
 
 <img src="doc/tide_example_7.png" width="600">

@@ -75,7 +75,7 @@ class TidePanel extends Equatable {
   }
 }
 
-/// The logging servcie is used to log messages to be displayed in the console.
+/// The logging service is used to log messages to be displayed in the console.
 class TideLoggingService {
   final _buffer = <String>[];
   List<String> get buffer => _buffer;
@@ -110,6 +110,7 @@ class TideConsole extends StatefulWidget {
 
 class _TideConsoleState extends State<TideConsole> {
   final ScrollController _scrollController = ScrollController();
+  int _previousBufferLength = 0;
 
   @override
   void dispose() {
@@ -141,6 +142,15 @@ class _TideConsoleState extends State<TideConsole> {
                 ValueListenableBuilder<int>(
                     valueListenable: widget.loggingService.data,
                     builder: (context, value, child) {
+                      final currentBufferLength = widget.loggingService.buffer.length;
+                      if (currentBufferLength > _previousBufferLength) {
+                        _previousBufferLength = currentBufferLength;
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (_scrollController.hasClients) {
+                            _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+                          }
+                        });
+                      }
                       return Expanded(
                         child: ListView.builder(
                           controller: _scrollController,

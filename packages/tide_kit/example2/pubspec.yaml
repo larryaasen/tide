@@ -14,7 +14,7 @@ dependencies:
   tide_kit:
     path: ../../tide_kit
 
-  spotify: ^0.13.7
+  spotify: 0.13.7
 
 dev_dependencies:
   flutter_test:

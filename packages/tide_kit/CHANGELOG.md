@@ -1,3 +1,9 @@
+## 1.7.0
+
+- Added Console example to README demonstrating the TideConsole widget with logging.
+- Fixed TideConsole autoscroll bug to properly scroll to bottom when new messages are added.
+- Fixed documentation typos in README and code comments.
+
 ## 1.6.0
 
 - Added an optional badge to an activity bar item.
