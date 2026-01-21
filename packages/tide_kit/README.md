@@ -404,6 +404,50 @@ When running this code on macOS you should see a window like this:
 
 <img src="doc/tide_example_6.png" width="600">
 
+### Console
+
+Use `TideConsole` as a way to display log messages in a console panel. The console displays messages from `TideLoggingService` and updates in real-time as new messages are logged.
+
+```dart
+void main() {
+  final _ = Tide();
+  final logging = TideLoggingService();
+  int messageIndex = 1;
+
+  Timer.periodic(const Duration(seconds: 1), (timer) {
+    logging.log('Message $messageIndex');
+    messageIndex++;
+  });
+
+  final workbenchService = Tide.getIt<TideWorkbenchService>();
+
+  workbenchService.layoutService.addPanel(const TidePanel());
+
+  runApp(
+    TideApp(
+      home: TideWindow(
+        workbench: TideWorkbench(
+          panelBuilder: (context, panel) {
+            return TidePanelWidget(
+              backgroundColor: Colors.purple.shade100,
+              position: TidePosition.bottom,
+              resizeSide: TidePosition.top,
+              child: TideConsole(
+                title: 'CONSOLE',
+                loggingService: logging,
+                backgroundColor: Colors.transparent,
+              ),
+            );
+          },
+        ),
+      ),
+    ),
+  );
+}
+```
+
+<!-- Screenshot to be added -->
+
 ### Quick Input
 
 Use `TideQuickInputBox` as a way to gather user input fron a `TextField`. It is a generic prompt
