@@ -94,6 +94,17 @@ class _TideConsoleState extends State<TideConsole> {
                 ValueListenableBuilder<int>(
                     valueListenable: widget.loggingService.data,
                     builder: (context, value, child) {
+                      // Scroll to bottom after the frame is built
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (_scrollController.hasClients) {
+                          _scrollController.animateTo(
+                            _scrollController.position.maxScrollExtent,
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeOut,
+                          );
+                        }
+                      });
+                      
                       return Expanded(
                         child: ListView.builder(
                           controller: _scrollController,
