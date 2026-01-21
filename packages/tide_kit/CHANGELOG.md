@@ -3,6 +3,12 @@
 - Activity Bar state moved
 - Panel layout
 
+## 1.7.0
+
+- Added Console example to README demonstrating TideConsole widget usage
+- Fixed TideConsole autoscroll bug where new log messages didn't automatically scroll into view
+- Updated README examples to use Tide.get<>() for API consistency
+
 ## 1.6.0
 
 - Added an optional badge to an activity bar item.
