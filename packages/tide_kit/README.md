@@ -423,7 +423,8 @@ void main() {
 
   final workbenchService = Tide.get<TideWorkbenchService>();
 
-  workbenchService.layoutService.addPanel(const TidePanel());
+  workbenchService.layoutService.rootNode =
+      TidePanelNodeLeaf(panels: const [TidePanel()]);
 
   runApp(
     TideApp(
