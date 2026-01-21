@@ -28,7 +28,7 @@ import 'tide_core.dart';
 
 */
 
-/// The logging servcie is used to log messages to be displayed in the console.
+/// The logging service is used to log messages to be displayed in the console.
 class TideLoggingService {
   final _buffer = <String>[];
   List<String> get buffer => _buffer;
