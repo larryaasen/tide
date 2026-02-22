@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'panels/tide_panel.dart';
+import 'panels/tide_node.dart';
 
-typedef TideOnShashDragCallback = void Function(
-    BuildContext context, TidePanelNodePair node, Offset delta);
+typedef TideOnSashDragCallback = void Function(
+    BuildContext contextSplitContainer, TidePanelPair node, Offset delta);
 
 /// A sash is a draggable widget with cursor that is used to resize panels in a
-/// [TidePanelNodePair].
+/// [TidePanelPair].
 class TideSash extends StatelessWidget {
   const TideSash({
     super.key,
@@ -16,18 +16,22 @@ class TideSash extends StatelessWidget {
     this.onSashDrag,
   });
 
-  final TidePanelNodePair node;
+  final TidePanelPair node;
   final BuildContext contextSplitContainer;
   final double dimension;
-  final TideOnShashDragCallback? onSashDrag;
+  final TideOnSashDragCallback? onSashDrag;
 
   @override
   Widget build(BuildContext context) {
+    final minMaxLocked =
+        node.minDimension != null && node.minDimension == node.maxDimension;
+    final showMouseCursorOnSash = node.showMouseCursorOnSash && !minMaxLocked;
+
     final sash = GestureDetector(
       onPanUpdate: (details) =>
           onSashDrag?.call(contextSplitContainer, node, details.delta),
       child: MouseRegion(
-        cursor: node.showMouseCursorOnSash
+        cursor: showMouseCursorOnSash
             ? node.isSashVertical
                 ? SystemMouseCursors.resizeColumn
                 : SystemMouseCursors.resizeRow

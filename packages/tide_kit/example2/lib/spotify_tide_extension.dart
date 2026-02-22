@@ -52,7 +52,7 @@ class SpotifyTideExtension extends TideExtension {
     final selectedItem = ValueNotifier<Object?>(null);
     final selectedTracks = ValueNotifier<Iterable<spotify.Track>?>(null);
 
-    tide.workbenchService.layoutService.addPanel(TidePanel(
+    tide.workbenchService.layoutService.addPanel(TidePanelOld.TidePanelOld(
       panelId: panelId,
       panelBuilder: (context, panel) {
         return TidePanelWidget(
@@ -96,7 +96,7 @@ class SpotifyTideExtension extends TideExtension {
       },
     ));
 
-    tide.workbenchService.layoutService.addPanel(TidePanel(
+    tide.workbenchService.layoutService.addPanel(TidePanelOld.TidePanelOld(
       panelId: const TideId('spotify.content.panel'),
       panelBuilder: (context, panel) {
         return TidePanelWidget(

@@ -9,6 +9,8 @@ typedef TideServicesAccessor = GetIt;
 
 enum TidePosition { left, top, center, right, bottom }
 
+enum TideOrientation { horizontal, vertical }
+
 class TideId extends Equatable {
   const TideId(this.id);
 

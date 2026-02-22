@@ -2,28 +2,34 @@ import 'package:flutter/material.dart';
 
 import '../tide_core.dart';
 
+@Deprecated('Not used anymore')
 class TidePanelWidget extends StatelessWidget {
+  @Deprecated('Not used anymore')
   const TidePanelWidget({
     super.key,
     this.panelId = TideId.empty,
     this.backgroundColor = Colors.grey,
-    this.position = TidePosition.left,
+    @Deprecated('Not used anymore') this.position = TidePosition.left,
     this.expanded = false,
     this.minWidth = 10,
     this.maxWidth = 3000,
     this.initialWidth = 200,
-    this.resizeSide,
+    @Deprecated('Not used anymore') this.resizeSide,
     this.child,
   });
 
   final TideId panelId;
   final Color backgroundColor;
+
+  @Deprecated('Not used anymore')
   final TidePosition position;
+
   final bool expanded;
   final double minWidth;
   final double maxWidth;
   final double initialWidth;
 
+  @Deprecated('Not used anymore')
   final TidePosition? resizeSide;
   final Widget? child;
 

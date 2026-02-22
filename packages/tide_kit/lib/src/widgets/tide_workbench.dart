@@ -3,25 +3,19 @@ import 'package:flutter/material.dart';
 import '../activity_bar/tide_activity_bar.dart';
 import '../notifications/tide_notification_center.dart';
 import '../notifications/tide_notifications.dart';
-import '../panels/tide_panel.dart';
 import '../services/tide_keybinding_service.dart';
 import '../services/tide_workbench_layout_service.dart';
 import '../services/tide_workbench_service.dart';
 import '../status_bar/tide_status_bar.dart';
 import '../tide.dart';
 import 'tide_panel_area.dart';
-import 'tide_panel_widget.dart';
 import 'tide_workbench_accessor.dart';
-
-typedef TidePanelBuilder = TidePanelWidget? Function(
-    BuildContext context, TidePanel panel);
 
 /// A workbench is the main widget that contains the activity bar, panel area, and status bar. It is a
 /// child of the [TideWindow] widget.
 class TideWorkbench extends StatelessWidget {
   TideWorkbench({
     super.key,
-    this.panelBuilder,
     this.activityBar,
     this.statusBar = const TideStatusBar(),
     this.backgroudColor = Colors.white,
@@ -33,7 +27,6 @@ class TideWorkbench extends StatelessWidget {
     }
   }
 
-  final TidePanelBuilder? panelBuilder;
   final TideActivityBar? activityBar;
   final TideStatusBar? statusBar;
   final Color backgroudColor;
@@ -62,10 +55,8 @@ class TideWorkbench extends StatelessWidget {
       activityBarWidget = activityBar;
     }
 
-    final panelArea = TidePanelArea(
-        rootNode: state.rootNode,
-        panelBuilder: panelBuilder,
-        layoutService: layoutService);
+    final panelArea =
+        TidePanelArea(rootNode: state.rootNode, layoutService: layoutService);
 
     final main = Column(
       children: [

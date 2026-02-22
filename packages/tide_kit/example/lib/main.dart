@@ -40,19 +40,23 @@ void main4() {
 void main5() {
   final _ = Tide();
   final workbenchService = Tide.getIt<TideWorkbenchService>();
-  workbenchService.layoutService.addPanel(const TidePanel());
+
+  workbenchService.layoutService.rootNode = TidePanelPair(
+    showMouseCursorOnSash: false,
+    start: TidePanel(
+      minDimension: 200.0,
+      maxDimension: 200.0,
+      builder: (context, panel) {
+        return const Center(child: Text('Left Panel'));
+      },
+    ),
+    end: TidePanel(),
+  );
 
   runApp(
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          panelBuilder: (context, panel) {
-            return const TidePanelWidget(
-              position: TidePosition.left,
-              resizeSide: TidePosition.right,
-              child: Center(child: Text('Left Panel')),
-            );
-          },
           statusBar: null,
         ),
       ),
@@ -61,19 +65,31 @@ void main5() {
 }
 
 /// Example 6: left and right panels.
-void main6() {
+void main() {
   final _ = Tide();
-  final leftPanelId = TideId.uniqueId();
-  final rightPanelId = TideId.uniqueId();
   final workbenchService = Tide.getIt<TideWorkbenchService>();
-  workbenchService.layoutService.addPanel(TidePanel(panelId: leftPanelId));
-  workbenchService.layoutService.addPanel(TidePanel(panelId: rightPanelId));
 
-  workbenchService.layoutService.rootNode = TidePanelNodePair(
-    start: TidePanelNodeLeaf(panels: [TidePanel(panelId: leftPanelId)]),
-    end: TidePanelNodePair(
-      start: TidePanelNodeLeaf(panels: const []),
-      end: TidePanelNodeLeaf(panels: [TidePanel(panelId: rightPanelId)]),
+  workbenchService.layoutService.rootNode = TidePanelPair(
+    start: TidePanel(
+      initialDimension: 200.0,
+      builder: (context, panel) {
+        return Container(
+          color: Colors.red.shade100,
+          child: const Center(child: Text('Left Panel')),
+        );
+      },
+    ),
+    end: TidePanelPair(
+      start: TidePanel(),
+      end: TidePanel(
+        initialDimension: 200.0,
+        builder: (context, panel) {
+          return Container(
+            color: Colors.green.shade100,
+            child: const Center(child: Text('Right Panel')),
+          );
+        },
+      ),
     ),
   );
 
@@ -81,24 +97,6 @@ void main6() {
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          panelBuilder: (context, panel) {
-            if (panel.panelId.id == leftPanelId.id) {
-              return TidePanelWidget(
-                backgroundColor: Colors.red.shade100,
-                position: TidePosition.left,
-                resizeSide: TidePosition.right,
-                child: const Center(child: Text('Left Panel')),
-              );
-            } else if (panel.panelId.id == rightPanelId.id) {
-              return TidePanelWidget(
-                backgroundColor: Colors.green.shade100,
-                position: TidePosition.right,
-                resizeSide: TidePosition.left,
-                child: const Center(child: Text('Right Panel')),
-              );
-            }
-            return null;
-          },
           statusBar: null,
         ),
       ),
@@ -109,38 +107,35 @@ void main6() {
 /// Example 7: left and center panels, and status bar.
 void main7() {
   final _ = Tide();
-  final leftPanelId = TideId.uniqueId();
-  final mainPanelId = TideId.uniqueId();
   final workbenchService = Tide.getIt<TideWorkbenchService>();
-  workbenchService.layoutService.addPanel(TidePanel(panelId: leftPanelId));
-  workbenchService.layoutService.addPanel(TidePanel(panelId: mainPanelId));
+
+  workbenchService.layoutService.rootNode = TidePanelPair(
+    start: TidePanel(
+      initialDimension: 200.0,
+      builder: (context, panel) {
+        return Container(
+          color: const Color(0xFF2C292F),
+          child: const Center(
+              child: Text('Left Panel', style: TextStyle(color: Colors.white))),
+        );
+      },
+    ),
+    end: TidePanel(
+      layoutSizing: TideLayoutSizing.flexible,
+      builder: (context, panel) {
+        return Container(
+          color: const Color(0xFF1B1B1B),
+          child: const Center(
+              child: Text('Main Panel', style: TextStyle(color: Colors.white))),
+        );
+      },
+    ),
+  );
 
   runApp(
     TideApp(
       home: TideWindow(
         workbench: TideWorkbench(
-          panelBuilder: (context, panel) {
-            if (panel.panelId.id == leftPanelId.id) {
-              return const TidePanelWidget(
-                backgroundColor: Color(0xFF2C292F),
-                position: TidePosition.left,
-                resizeSide: TidePosition.right,
-                child: Center(
-                    child: Text('Left Panel',
-                        style: TextStyle(color: Colors.white))),
-              );
-            } else if (panel.panelId.id == mainPanelId.id) {
-              return const TidePanelWidget(
-                backgroundColor: Color(0xFF1B1B1B),
-                expanded: true,
-                position: TidePosition.center,
-                child: Center(
-                    child: Text('Main Panel',
-                        style: TextStyle(color: Colors.white))),
-              );
-            }
-            return null;
-          },
           statusBar: TideStatusBar(items: [
             TideStatusBarItemText(
                 text: 'Status Bar1', position: TideStatusBarItemPosition.left),
@@ -155,7 +150,7 @@ void main7() {
 }
 
 /// Example 8: left, middle, right, top, bottom panels, and status bar.
-void main() {
+void main8() {
   final _ = Tide();
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();
@@ -165,29 +160,22 @@ void main() {
 
   final workbenchService = Tide.getIt<TideWorkbenchService>();
 
-  workbenchService.layoutService.addPanels([
-    TidePanel(panelId: leftPanelId),
-    TidePanel(panelId: mainPanelId),
-    TidePanel(panelId: rightPanelId),
-    TidePanel(panelId: topPanelId),
-    TidePanel(panelId: bottomPanelId),
-  ]);
-
-  workbenchService.layoutService.rootNode = TidePanelNodePair(
+  workbenchService.layoutService.rootNode = TidePanelPair(
     orientation: TideOrientation.vertical,
-    start: TidePanelNodeLeaf(panels: [TidePanel(panelId: topPanelId)]),
+    start: TidePanel(
+        panelId: topPanelId, minDimension: 200, panels: [const TidePanelOld()]),
     // end: TidePanelNodeLeaf(panels: [TidePanel(panelId: bottomPanelId)]),
-    end: TidePanelNodePair(
+    end: TidePanelPair(
       orientation: TideOrientation.vertical,
-      start: TidePanelNodePair(
+      start: TidePanelPair(
         orientation: TideOrientation.horizontal,
-        start: TidePanelNodeLeaf(panels: [TidePanel(panelId: leftPanelId)]),
-        end: TidePanelNodePair(
-          start: TidePanelNodeLeaf(panels: [TidePanel(panelId: mainPanelId)]),
-          end: TidePanelNodeLeaf(panels: [TidePanel(panelId: rightPanelId)]),
+        start: TidePanel(panels: [TidePanelOld(panelId: leftPanelId)]),
+        end: TidePanelPair(
+          start: TidePanel(panels: [TidePanelOld(panelId: mainPanelId)]),
+          end: TidePanel(panels: [TidePanelOld(panelId: rightPanelId)]),
         ),
       ),
-      end: TidePanelNodeLeaf(panels: [TidePanel(panelId: bottomPanelId)]),
+      end: TidePanel(panels: [TidePanelOld(panelId: bottomPanelId)]),
     ),
   );
 
@@ -253,7 +241,7 @@ void main9() {
 
   final workbenchService = Tide.getIt<TideWorkbenchService>();
 
-  workbenchService.layoutService.addPanel(const TidePanel());
+  workbenchService.layoutService.addPanel(const TidePanelOld());
 
   runApp(
     TideApp(
@@ -343,7 +331,7 @@ void main12() {
   tide.useServices(services: [Tide.ids.service.time]);
 
   final workbenchService = Tide.getIt<TideWorkbenchService>();
-  workbenchService.layoutService.addPanel(const TidePanel());
+  workbenchService.layoutService.addPanel(const TidePanelOld());
   workbenchService.layoutService.addActivityBarItems([
     TideActivityBarItem(
       title: 'Explorer',
@@ -394,7 +382,7 @@ void main13() {
   );
 
   final workbenchService = Tide.getIt<TideWorkbenchService>();
-  workbenchService.layoutService.addPanel(const TidePanel());
+  workbenchService.layoutService.addPanel(const TidePanelOld());
   workbenchService.layoutService.addActivityBarItems([
     TideActivityBarItem(
       title: 'Explorer',
@@ -440,7 +428,7 @@ void main14() {
 
   final workbenchService = Tide.getIt<TideWorkbenchService>();
   final leftPanelId = TideId.uniqueId();
-  workbenchService.layoutService.addPanel(TidePanel(panelId: leftPanelId));
+  workbenchService.layoutService.addPanel(TidePanelOld(panelId: leftPanelId));
   workbenchService.layoutService.addActivityBarItems([
     TideActivityBarItem(
       title: 'Explorer',
@@ -496,10 +484,15 @@ void main15() {
   const togglePanelVisibility = TideId('app.command.toggleLeftPanelVisibility');
 
   final workbenchService = Tide.getIt<TideWorkbenchService>();
-  workbenchService.layoutService.addPanels([
-    TidePanel(panelId: leftPanelId),
-    TidePanel(panelId: mainPanelId),
-  ]);
+
+  workbenchService.layoutService.rootNode = TidePanelPair(
+    orientation: TideOrientation.horizontal,
+    start: TidePanel(
+        minDimension: 100, panels: [TidePanelOld(panelId: leftPanelId)]),
+    end: TidePanel(
+        minDimension: 100, panels: [TidePanelOld(panelId: mainPanelId)]),
+  );
+
   workbenchService.layoutService.addActivityBarItems([
     TideActivityBarItem(
       title: 'Calendar Day',
@@ -607,7 +600,7 @@ class MyCalendarExtension extends TideExtension {
       ),
     );
 
-    tide.workbenchService.layoutService.addPanel(TidePanel(
+    tide.workbenchService.layoutService.addPanel(TidePanelOld(
       panelId: panelId,
       panelBuilder: (context, panel) {
         if (panel.panelId == panelId) {
@@ -655,8 +648,8 @@ void main17() {
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();
   final workbenchService = Tide.getIt<TideWorkbenchService>();
-  workbenchService.layoutService.addPanel(TidePanel(panelId: leftPanelId));
-  workbenchService.layoutService.addPanel(TidePanel(panelId: mainPanelId));
+  workbenchService.layoutService.addPanel(TidePanelOld(panelId: leftPanelId));
+  workbenchService.layoutService.addPanel(TidePanelOld(panelId: mainPanelId));
 
   runApp(
     TideApp(
@@ -732,8 +725,8 @@ void main18() {
 
   final workbenchService = Tide.getIt<TideWorkbenchService>();
   workbenchService.layoutService.addPanels([
-    TidePanel(panelId: leftPanelId),
-    TidePanel(panelId: mainPanelId),
+    TidePanelOld(panelId: leftPanelId),
+    TidePanelOld(panelId: mainPanelId),
   ]);
   workbenchService.layoutService.addActivityBarItems([
     TideActivityBarItem(
@@ -921,8 +914,8 @@ void main19() {
 
   // Add panels: left and main
   workbenchService.layoutService.addPanels([
-    TidePanel(panelId: leftPanelId),
-    TidePanel(panelId: mainPanelId),
+    TidePanelOld(panelId: leftPanelId),
+    TidePanelOld(panelId: mainPanelId),
   ]);
 
   // Setup activity bar item: Search
@@ -1043,7 +1036,7 @@ void main20() {
     Tide.ids.service.time,
   ]);
 
-  tide.workbenchService.layoutService.addPanel(TidePanel(
+  tide.workbenchService.layoutService.addPanel(TidePanelOld(
     panelBuilder: (context, panel) {
       return TidePanelWidget(
         panelId: panel.panelId,
