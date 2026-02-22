@@ -43,17 +43,17 @@ abstract class TidePanelNode extends Equatable {
   static const defaultMinDimension = 100.0;
   static const defaultMaxDimension = double.infinity;
 
-  TidePanelNode(@Deprecated('Not used anymore') TideId? nodeId,
-      {this.minDimension,
-      this.maxDimension,
-      this.initialDimension,
-      this.layoutSizing = TideLayoutSizing.normal})
-      : nodeId = nodeId ?? TideId.uniqueId(),
+  TidePanelNode({
+    TideId? nodeId,
+    this.minDimension,
+    this.maxDimension,
+    this.initialDimension,
+    this.layoutSizing = TideLayoutSizing.normal,
+  })  : nodeId = nodeId ?? TideId.uniqueId(),
         assert((minDimension ?? defaultMinDimension) <=
             (maxDimension ?? defaultMaxDimension)),
         assert((minDimension ?? defaultMinDimension) >= 0);
 
-  @Deprecated('Not used anymore')
   final TideId nodeId;
 
   /// The minimum dimension for the node.
@@ -73,7 +73,31 @@ abstract class TidePanelNode extends Equatable {
 
   @override
   List<Object?> get props =>
-      [nodeId, minDimension, maxDimension, initialDimension, layoutSizing];
+      [minDimension, maxDimension, initialDimension, layoutSizing];
+
+  /// Find a panel in the tree by its ID.
+  TidePanel? findPanel(TideId panelId) {
+    if (this is TidePanel) {
+      final panel = this as TidePanel;
+      if (panel.panelId == panelId) {
+        return panel;
+      }
+      for (final child in panel.panels) {
+        final found = child.findPanel(panelId);
+        if (found != null) {
+          return found;
+        }
+      }
+    } else if (this is TidePanelPair) {
+      final pair = this as TidePanelPair;
+      final foundInStart = pair.start.findPanel(panelId);
+      if (foundInStart != null) {
+        return foundInStart;
+      }
+      return pair.end.findPanel(panelId);
+    }
+    return null;
+  }
 }
 
 extension TidePanelNodeExt on TidePanelNode {
@@ -113,35 +137,81 @@ typedef TidePanelLeafBuilder = Widget Function(
 //     BuildContext context, TidePanel panel);
 
 class TidePanel extends TidePanelNode {
-  TidePanel(
-      {TideId? nodeId,
-      super.minDimension,
-      super.maxDimension,
-      super.initialDimension,
-      super.layoutSizing,
-      this.builder})
-      : super(nodeId);
+  TidePanel({
+    super.nodeId,
+    TideId? panelId,
+    super.minDimension,
+    super.maxDimension,
+    super.initialDimension,
+    super.layoutSizing,
+    this.builder,
+    this.panels = const [],
+    this.activeTabIndex = 0,
+    this.isVisible = true,
+    this.showHeader = false,
+    this.title,
+  }) : panelId = panelId ?? const TideId('');
+
+  /// The panel ID to uniquely identify this panel content.
+  final TideId panelId;
+
+  /// Whether the panel content is visible.
+  final bool isVisible;
+
+  /// Whether to show the header for this panel.
+  final bool showHeader;
+
+  /// The title text for this panel.
+  final String? title;
 
   /// The builder is used to provide the content widget for this node.
   final TidePanelLeafBuilder? builder;
 
+  /// The list of child panels in this node.
+  final List<TidePanel> panels;
+
+  /// The currently active tab index among the panels.
+  final int activeTabIndex;
+
   @override
-  List<Object?> get props => [...super.props, builder];
+  List<Object?> get props => [
+        ...super.props,
+        panelId,
+        isVisible,
+        showHeader,
+        title,
+        builder,
+        panels,
+        activeTabIndex
+      ];
 
   TidePanel copyWith({
+    TideId? nodeId,
+    TideId? panelId,
     double? minDimension,
     double? maxDimension,
     double? initialDimension,
     TideLayoutSizing? layoutSizing,
     TidePanelLeafBuilder? builder,
+    List<TidePanel>? panels,
+    int? activeTabIndex,
+    bool? isVisible,
+    bool? showHeader,
+    String? title,
   }) {
     return TidePanel(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
+      panelId: panelId ?? this.panelId,
       minDimension: minDimension ?? this.minDimension,
       maxDimension: maxDimension ?? this.maxDimension,
       initialDimension: initialDimension ?? this.initialDimension,
       layoutSizing: layoutSizing ?? this.layoutSizing,
       builder: builder ?? this.builder,
+      panels: panels ?? this.panels,
+      activeTabIndex: activeTabIndex ?? this.activeTabIndex,
+      isVisible: isVisible ?? this.isVisible,
+      showHeader: showHeader ?? this.showHeader,
+      title: title ?? this.title,
     );
   }
 }
@@ -152,22 +222,21 @@ class TidePanel extends TidePanelNode {
 /// other, depending on the orientation. The split ratio determines how much
 /// space each node takes up in the layout, extending from the start to the end.
 class TidePanelPair extends TidePanelNode {
-  TidePanelPair(
-      {TideId? nodeId,
-      super.minDimension,
-      super.maxDimension,
-      super.initialDimension,
-      super.layoutSizing,
-      required this.start,
-      required this.end,
-      this.orientation = TideOrientation.horizontal,
-      double? splitDimension,
-      this.showMouseCursorOnSash = true,
-      this.showSeparatorOnSashAfterHover = false,
-      this.showBorderBetweenNodes = true})
-      : splitDimension =
-            adjustedSplit(minDimension, maxDimension, splitDimension),
-        super(nodeId);
+  TidePanelPair({
+    super.nodeId,
+    super.minDimension,
+    super.maxDimension,
+    super.initialDimension,
+    super.layoutSizing,
+    required this.start,
+    required this.end,
+    this.orientation = TideOrientation.horizontal,
+    double? splitDimension,
+    this.showMouseCursorOnSash = true,
+    this.showSeparatorOnSashAfterHover = false,
+    this.showBorderBetweenNodes = true,
+  }) : splitDimension =
+            adjustedSplit(minDimension, maxDimension, splitDimension);
 
   static double? adjustedSplit(
       double? minDimension, double? maxDimension, double? splitDimension) {
@@ -212,6 +281,7 @@ class TidePanelPair extends TidePanelNode {
       ];
 
   TidePanelPair copyWith({
+    TideId? nodeId,
     double? minDimension,
     double? maxDimension,
     double? initialDimension,
@@ -223,7 +293,7 @@ class TidePanelPair extends TidePanelNode {
     bool? showMouseCursorOnSash,
   }) {
     return TidePanelPair(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       minDimension: minDimension ?? this.minDimension,
       maxDimension: maxDimension ?? this.maxDimension,
       initialDimension: initialDimension ?? this.initialDimension,
@@ -279,24 +349,3 @@ class TidePanelPair extends TidePanelNode {
     return null;
   }
 }
-
-/*
-void _test() {
-  Widget builder(BuildContext context, TidePanel panel) {
-    return const Text('Panel');
-  }
-
-  final root1 = TidePanel(builder: builder);
-  final root2 = TidePanelPair(
-    start: TidePanel(builder: builder),
-    end: TidePanel(builder: builder),
-  );
-  final root3 = TidePanelPair(
-    start: TidePanel(builder: (context, panel) => const Text('Left Panel')),
-    end: TidePanelPair(
-      start: TidePanel(builder: (context, panel) => const Text('Content')),
-      end: TidePanel(builder: (context, panel) => const Text('Right Panel')),
-    ),
-  );
-}
-*/

@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 
 import '../activity_bar/tide_activity_bar.dart';
 import '../panels/tide_node.dart';
-import '../panels/tide_panel_old.dart';
 import '../status_bar/tide_status_bar_item.dart';
 import '../tide_core.dart';
 import '../widgets/tide_badge.dart';
@@ -92,43 +91,22 @@ class TideStatusBarState extends Equatable {
 
 class TideWorkbenchLayoutState extends Equatable {
   TideWorkbenchLayoutState({
-    this.panels = const [],
     TidePanelNode? rootNode,
   }) : rootNode = rootNode ?? TidePanel();
 
-  final List<TidePanelOld> panels;
   final TidePanelNode rootNode;
 
   @override
-  List<Object?> get props => [panels, rootNode];
+  List<Object?> get props => [rootNode];
 
-  TidePanelOld? getPanel(TideId panelId) {
-    if (panelId.id.isEmpty && panels.length == 1) {
-      return panels[0];
-    }
-    for (final panel in panels) {
-      if (panel.panelId == panelId) {
-        return panel;
-      }
-    }
-    return null;
-  }
-
-  int getPanelIndex(TideId? panelId) {
-    for (int i = 0; i < panels.length; i++) {
-      if (panels[i].panelId.id == panelId?.id) {
-        return i;
-      }
-    }
-    return -1;
+  TidePanel? getPanel(TideId panelId) {
+    return rootNode.findPanel(panelId);
   }
 
   TideWorkbenchLayoutState copyWith({
-    List<TidePanelOld>? panels,
     TidePanelNode? rootNode,
   }) {
     return TideWorkbenchLayoutState(
-      panels: panels ?? this.panels,
       rootNode: rootNode ?? this.rootNode,
     );
   }
@@ -177,86 +155,32 @@ class TideWorkbenchLayoutService {
 extension TideWorkbenchLayoutServicePanels on TideWorkbenchLayoutService {
   /// Get the panel visibility.
   bool getPanelVisible(TideId panelId) {
-    final currentState = state.value;
-    if (panelId.id.isEmpty && currentState.panels.length > 1) {
-      throw ArgumentError(
-          'Tide: TideWorkbenchLayoutService.setPanelVisible panelId cannot be empty');
-    }
-    final panel = currentState.getPanel(panelId);
+    final panel = state.value.getPanel(panelId);
     return panel?.isVisible ?? false;
   }
 
   /// Set the panel visibility.
   void setPanelVisible(TideId panelId, bool visible) {
-    final currentState = state.value;
-    if (panelId.id.isEmpty && currentState.panels.length > 1) {
-      throw ArgumentError(
-          'Tide: TideWorkbenchLayoutService.setPanelVisible panelId cannot be empty');
-    }
-    TidePanelOld? newPanel;
-    final panel = currentState.getPanel(panelId);
+    final panel = state.value.getPanel(panelId);
     if (panel != null) {
-      newPanel = panel.copyWith(isVisible: visible);
+      replaceNode(panel.copyWith(isVisible: visible));
     }
-
-    if (newPanel != null) {
-      replacePanel(newPanel);
-    }
-  }
-
-  TidePanelNode? replaceNode(
-    TidePanelNode node,
-    bool Function(TidePanelNode) match,
-    TidePanelNode Function(TidePanelNode) replaceWith,
-  ) {
-    if (match(node)) {
-      return replaceWith(node);
-    }
-
-    final TidePanelNode? newChildren;
-    var changed = false;
-
-    if (node is TidePanelPair) {
-      final replacedChild = replaceNode(node.start, match, replaceWith);
-      if (replacedChild != null) {
-        newChildren = replacedChild;
-        changed = true;
-      } else {
-        newChildren = node.start;
-      }
-    }
-
-    if (changed) {
-      return node. .copyWith(children: newChildren);
-    }
-
-    return node;
   }
 
   @Deprecated('Use layoutService.rootNode')
-  void addPanel(TidePanelOld newPanel) {
-    final currentState = state.value;
-    if (currentState.getPanel(newPanel.panelId) != null) {
-      throw ArgumentError(
-          'Tide: TideWorkbenchLayoutService.addPanel panelId already exists');
-    }
-    final newList = List<TidePanelOld>.from(currentState.panels)..add(newPanel);
-    updateState(currentState.copyWith(panels: newList));
+  void addPanel(TidePanel newPanel) {
+    rootNode = newPanel;
   }
 
   @Deprecated('Use layoutService.rootNode')
-  void addPanels(List<TidePanelOld> panels) {
-    for (final panel in panels) {
-      addPanel(panel);
+  void addPanels(List<TidePanel> panels) {
+    if (panels.isNotEmpty) {
+      addPanel(panels.first);
     }
   }
 
-  void replacePanel(TidePanelOld newPanel) {
-    final currentState = state.value;
-    final index = currentState.getPanelIndex(newPanel.panelId);
-    final newList = List<TidePanelOld>.from(currentState.panels)
-      ..[index] = newPanel;
-    updateState(currentState.copyWith(panels: newList));
+  void replacePanel(TidePanel newPanel) {
+    replaceNode(newPanel);
   }
 
   void replaceNode(TidePanelNode newNode) {
@@ -275,8 +199,34 @@ extension TideWorkbenchLayoutServicePanels on TideWorkbenchLayoutService {
       return node;
     }
 
+    TidePanelNode cleanupEmptyNodes(TidePanelNode node) {
+      if (node is TidePanelPair) {
+        final start = cleanupEmptyNodes(node.start);
+        final end = cleanupEmptyNodes(node.end);
+
+        final startEmpty = start is TidePanel &&
+            start.panels.where((p) => p.isVisible).isEmpty &&
+            start.builder == null;
+        final endEmpty = end is TidePanel &&
+            end.panels.where((p) => p.isVisible).isEmpty &&
+            end.builder == null;
+
+        if (startEmpty && endEmpty) {
+          return TidePanel(); // Return empty leaf
+        } else if (startEmpty) {
+          return end;
+        } else if (endEmpty) {
+          return start;
+        }
+        return node.copyWith(start: start, end: end);
+      }
+      return node;
+    }
+
     final updatedRoot = replace(currentState.rootNode);
-    updateState(currentState.copyWith(rootNode: updatedRoot));
+    final cleanedRoot = cleanupEmptyNodes(updatedRoot);
+
+    updateState(currentState.copyWith(rootNode: cleanedRoot));
   }
 }
 

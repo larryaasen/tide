@@ -34,6 +34,8 @@
 ## Panels
 
 - Add support for tabbed panels.
+- Add docking drag-and-drop functionality for tearing off panels and recombining them.
+- Add drag target & splitting indicators (drop zones for complex docking layouts).
 
 ## Notifications
 
@@ -56,3 +58,4 @@
 ## Documentation
 
 - Need to document all public symbols.
+- Need to add panel title example, and console example, to README.

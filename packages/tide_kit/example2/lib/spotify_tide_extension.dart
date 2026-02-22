@@ -52,76 +52,73 @@ class SpotifyTideExtension extends TideExtension {
     final selectedItem = ValueNotifier<Object?>(null);
     final selectedTracks = ValueNotifier<Iterable<spotify.Track>?>(null);
 
-    tide.workbenchService.layoutService.addPanel(TidePanelOld.TidePanelOld(
-      panelId: panelId,
-      panelBuilder: (context, panel) {
-        return TidePanelWidget(
-          panelId: panel.panelId,
-          backgroundColor: const Color(0xFFF3F3F3),
-          position: TidePosition.left,
-          resizeSide: TidePosition.right,
-          minWidth: 150,
-          maxWidth: 450,
-          initialWidth: 220,
-          child: TideSearchPanel(
-            searchFieldFocusNode: searchFieldFocusNode,
-            onChanged: (value) {
-              spotifyService.search(value);
-            },
-            results: SpotifySearchResults(
-              spotifyService: spotifyService,
-              onSelected: (item) {
-                selectedItem.value = item;
-                selectedTracks.value = null;
-                if (item is spotify.Artist && item.id != null) {
-                  Future.delayed(Duration.zero, () async {
-                    selectedTracks.value =
-                        await spotifyService.loadArtistTopTracks(item.id!);
-                  });
-                } else if (item is spotify.PlaylistSimple && item.id != null) {
-                  Future.delayed(Duration.zero, () async {
-                    selectedTracks.value =
-                        await spotifyService.loadPlaylist(item.id!);
-                  });
-                  // } else if (item is spotify.Playlist && item.id != null) {
-                  //   Future.delayed(Duration.zero, () async {
-                  //     selectedTracks.value =
-                  //         await spotifyService.loadArtistTopTracks(item.id!);
-                  //   });
-                }
-              },
-            ),
-          ),
-        );
-      },
-    ));
-
-    tide.workbenchService.layoutService.addPanel(TidePanelOld.TidePanelOld(
-      panelId: const TideId('spotify.content.panel'),
-      panelBuilder: (context, panel) {
-        return TidePanelWidget(
-          backgroundColor: Colors.white,
-          expanded: true,
-          minWidth: 150,
-          position: TidePosition.center,
-          child: ValueListenableBuilder<Object?>(
-              valueListenable: selectedItem,
-              builder: (context, state, child) {
-                return ValueListenableBuilder<Object?>(
-                    valueListenable: selectedTracks,
-                    builder: (context, state, child) {
-                      return SpotifyContentPanel(
-                        spotifyService: spotifyService,
-                        item: selectedItem.value != null
-                            ? SpotifyObject(item: selectedItem.value!)
-                            : null,
-                        tracks: selectedTracks.value,
-                      );
-                    });
-              }),
-        );
-      },
-    ));
+    tide.workbenchService.layoutService.rootNode = TidePanelPair(
+        start: TidePanel(
+          panelId: panelId,
+          minDimension: 150,
+          maxDimension: 450,
+          initialDimension: 220,
+          builder: (context, panel) {
+            return Container(
+              color: const Color(0xFFF3F3F3),
+              child: TideSearchPanel(
+                searchFieldFocusNode: searchFieldFocusNode,
+                onChanged: (value) {
+                  spotifyService.search(value);
+                },
+                results: SpotifySearchResults(
+                  spotifyService: spotifyService,
+                  onSelected: (item) {
+                    selectedItem.value = item;
+                    selectedTracks.value = null;
+                    if (item is spotify.Artist && item.id != null) {
+                      Future.delayed(Duration.zero, () async {
+                        selectedTracks.value =
+                            await spotifyService.loadArtistTopTracks(item.id!);
+                      });
+                    } else if (item is spotify.PlaylistSimple &&
+                        item.id != null) {
+                      Future.delayed(Duration.zero, () async {
+                        selectedTracks.value =
+                            await spotifyService.loadPlaylist(item.id!);
+                      });
+                      // } else if (item is spotify.Playlist && item.id != null) {
+                      //   Future.delayed(Duration.zero, () async {
+                      //     selectedTracks.value =
+                      //         await spotifyService.loadArtistTopTracks(item.id!);
+                      //   });
+                    }
+                  },
+                ),
+              ),
+            );
+          },
+        ),
+        end: TidePanel(
+          panelId: const TideId('spotify.content.panel'),
+          minDimension: 150,
+          layoutSizing: TideLayoutSizing.flexible,
+          builder: (context, panel) {
+            return Container(
+              color: Colors.white,
+              child: ValueListenableBuilder<Object?>(
+                  valueListenable: selectedItem,
+                  builder: (context, state, child) {
+                    return ValueListenableBuilder<Object?>(
+                        valueListenable: selectedTracks,
+                        builder: (context, state, child) {
+                          return SpotifyContentPanel(
+                            spotifyService: spotifyService,
+                            item: selectedItem.value != null
+                                ? SpotifyObject(item: selectedItem.value!)
+                                : null,
+                            tracks: selectedTracks.value,
+                          );
+                        });
+                  }),
+            );
+          },
+        ));
 
     // tide.workbenchService.layoutService.addActivityBarItems([
     //   TideActivityBarItem(
@@ -522,6 +519,7 @@ class SpotifyService {
 
   Future<Iterable<spotify.Track>> loadPlaylist(String playlistId) async {
     final playlist =
+        // ignore: deprecated_member_use
         await _spotify.playlists.getTracksByPlaylistId(playlistId).all();
     return playlist;
   }

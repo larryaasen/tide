@@ -82,6 +82,7 @@ class TideQuickInputBoxWidget extends StatefulWidget {
 
   static Future<T?> show<T>(BuildContext context, TideQuickInputBox inputBox) {
     return showDialog<T>(
+      useRootNavigator: false,
       barrierColor: Colors.transparent,
       context: context,
       builder: (BuildContext context) {
@@ -149,6 +150,7 @@ class TideQuickPickWidget extends StatefulWidget {
 
   static Future<T?> show<T>(BuildContext context, TideQuickPick quickPick) {
     return showDialog<T>(
+      useRootNavigator: false,
       barrierColor: Colors.transparent,
       context: context,
       builder: (BuildContext context) {

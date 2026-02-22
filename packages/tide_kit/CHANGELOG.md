@@ -1,7 +1,8 @@
 ## 2.0.0
 
 - Activity Bar state moved
-- Panel layout
+- Refactored the panel system to move layout constraints and builders directly into `TidePanel`, and deprecated `TidePanelWidget`.
+- Added a new Gallery example app.
 
 ## 1.6.0
 

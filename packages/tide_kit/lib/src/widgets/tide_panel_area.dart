@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 
 import '../panels/tide_node.dart';
 import '../services/tide_workbench_layout_service.dart';
-import '../tide.dart';
 import '../tide_sash.dart';
 
 class TidePanelArea extends StatelessWidget {
-  const TidePanelArea(
-      {super.key, required this.rootNode, required this.layoutService});
+  const TidePanelArea({
+    super.key,
+    required this.rootNode,
+    required this.layoutService,
+    this.sashColor,
+    this.sashWidth = 4.0,
+  });
 
   final TidePanelNode rootNode;
   final TideWorkbenchLayoutService layoutService;
+  final Color? sashColor;
+  final double? sashWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +25,9 @@ class TidePanelArea extends StatelessWidget {
   }
 
   Widget _buildPanelNode(BuildContext context, TidePanelNode node) {
+    if (!_isNodeVisible(node)) {
+      return const SizedBox.shrink();
+    }
     if (node is TidePanel) {
       return _buildPanelContainer(context, node);
     } else if (node is TidePanelPair) {
@@ -28,28 +37,120 @@ class TidePanelArea extends StatelessWidget {
     }
   }
 
+  bool _isNodeVisible(TidePanelNode node) {
+    if (node is TidePanel) {
+      if (!node.isVisible) return false;
+      if (node.panels.isNotEmpty) {
+        return node.panels.any((p) => p.isVisible);
+      }
+      return node.builder != null;
+    } else if (node is TidePanelPair) {
+      return _isNodeVisible(node.start) || _isNodeVisible(node.end);
+    }
+    return false;
+  }
+
   Widget _buildPanelContainer(BuildContext context, TidePanel node) {
-    if (node.builder == null) {
+    if (node.panels.isNotEmpty) {
+      return _buildTabbedPanelContainer(context, node);
+    }
+
+    if (node.builder != null) {
+      return node.builder?.call(context, node) ?? const SizedBox.shrink();
+    }
+
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildTabbedPanelContainer(BuildContext context, TidePanel node) {
+    final panels = node.panels.where((p) => p.isVisible).toList();
+    if (panels.isEmpty) {
       return const SizedBox.shrink();
     }
 
-    final panelWidget =
-        node.builder?.call(context, node) ?? const SizedBox.shrink();
-    return panelWidget;
+    final activeIndex =
+        node.activeTabIndex >= 0 && node.activeTabIndex < panels.length
+            ? node.activeTabIndex
+            : 0;
 
-    // Widget constrainedPanelWidget = ConstrainedBox(
-    //   constraints: BoxConstraints(
-    //     minWidth: panelWidget.minWidth,
-    //     maxWidth: panelWidget.maxWidth,
-    //   ),
-    //   child: panelWidget,
-    // );
-    // return panelWidget.expanded
-    //     ? Expanded(child: constrainedPanelWidget)
-    //     : constrainedPanelWidget;
+    final activePanel = panels[activeIndex];
+
+    final header = Container(
+      height: 35,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3F3F3),
+        border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+      ),
+      child: Row(
+        children: panels.asMap().entries.map((entry) {
+          final index = entry.key;
+          final panel = entry.value;
+          final isActive = index == activeIndex;
+
+          return GestureDetector(
+            onTap: () {
+              final newNode = node.copyWith(activeTabIndex: index);
+              layoutService.replaceNode(newNode);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: isActive ? Colors.white : Colors.transparent,
+                border: isActive
+                    ? Border(
+                        top: const BorderSide(color: Colors.blue, width: 2),
+                        right: BorderSide(color: Colors.grey.shade300),
+                        left: index > 0
+                            ? BorderSide(color: Colors.grey.shade300)
+                            : BorderSide.none,
+                      )
+                    : Border(
+                        right: BorderSide(color: Colors.grey.shade300),
+                      ),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                panel.title ?? '',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isActive ? Colors.black : Colors.grey.shade600,
+                  fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+
+    final content = activePanel.builder?.call(context, activePanel) ??
+        const Center(child: Text("No content builder"));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (node.showHeader) header,
+        Expanded(child: content),
+      ],
+    );
   }
 
   Widget _buildSplitContainer(BuildContext context, TidePanelPair node) {
+    final startVisible = _isNodeVisible(node.start);
+    final endVisible = _isNodeVisible(node.end);
+
+    if (!startVisible && !endVisible) {
+      return const SizedBox.shrink();
+    }
+
+    if (!startVisible) {
+      return _buildPanelNode(context, node.end);
+    }
+
+    if (!endVisible) {
+      return _buildPanelNode(context, node.start);
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final boxSize = constraints.biggest;
@@ -77,8 +178,6 @@ class TidePanelArea extends StatelessWidget {
 
         final clampedSplitDimension =
             clampSplitDimension(boxSize, node, splitValue).round();
-
-        Tide.log('clampedSplitDimension: $clampedSplitDimension');
 
         final startChild = Stack(children: [
           startNode,
@@ -140,19 +239,19 @@ class TidePanelArea extends StatelessWidget {
     return Container(
       width: isVertical ? borderDimension : null,
       height: isVertical ? null : borderDimension,
-      color: Colors.grey.shade300,
+      color: sashColor ?? Colors.grey.shade300,
     );
   }
 
   Widget? _buildSash(BuildContext contextSplitContainer, TidePanelPair node) {
     if (!node.useSash && !node.showBorderBetweenNodes) return null;
 
-    const sashWidth = 4;
+    final width = sashWidth ?? 4.0;
 
     final sash = TideSash(
         node: node,
         contextSplitContainer: contextSplitContainer,
-        dimension: sashWidth / 2,
+        dimension: width / 2,
         onSashDrag: _handleSashDrag);
 
     return sash;

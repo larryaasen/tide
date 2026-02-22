@@ -65,9 +65,39 @@ class _TideConsoleState extends State<TideConsole> {
   final ScrollController _scrollController = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+    widget.loggingService.data.addListener(_scrollToBottom);
+  }
+
+  @override
+  void didUpdateWidget(TideConsole oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.loggingService != oldWidget.loggingService) {
+      oldWidget.loggingService.data.removeListener(_scrollToBottom);
+      widget.loggingService.data.addListener(_scrollToBottom);
+    }
+  }
+
+  @override
   void dispose() {
+    widget.loggingService.data.removeListener(_scrollToBottom);
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    }
   }
 
   @override
@@ -151,6 +181,9 @@ class Tide {
 
   static final _getIt = GetIt.asNewInstance();
 
+  /// Whether internal Tide log messages are enabled. Defaults to false.
+  static bool isInternalLoggingEnabled = false;
+
   // workbenchService;
 
   /// The one [GetIt] instance for Tide level instances.
@@ -224,7 +257,11 @@ class Tide {
   }
 
   /// System log.
-  static log(Object? object) {
+  static void log(Object? object) {
+    if (!isInternalLoggingEnabled) {
+      return;
+    }
+
     // final loggingService = get<TideLoggingService>();
     // loggingService.log(message);
 

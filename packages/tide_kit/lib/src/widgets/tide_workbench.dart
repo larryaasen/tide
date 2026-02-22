@@ -19,6 +19,8 @@ class TideWorkbench extends StatelessWidget {
     this.activityBar,
     this.statusBar = const TideStatusBar(),
     this.backgroudColor = Colors.white,
+    this.panelSashColor,
+    this.panelSashWidth,
   }) {
     Tide.log("Tide: TideWorkbench created");
 
@@ -30,6 +32,8 @@ class TideWorkbench extends StatelessWidget {
   final TideActivityBar? activityBar;
   final TideStatusBar? statusBar;
   final Color backgroudColor;
+  final Color? panelSashColor;
+  final double? panelSashWidth;
 
   TideWorkbenchService get workbenchService =>
       Tide.getIt<TideWorkbenchService>();
@@ -55,8 +59,12 @@ class TideWorkbench extends StatelessWidget {
       activityBarWidget = activityBar;
     }
 
-    final panelArea =
-        TidePanelArea(rootNode: state.rootNode, layoutService: layoutService);
+    final panelArea = TidePanelArea(
+      rootNode: state.rootNode,
+      layoutService: layoutService,
+      sashColor: panelSashColor,
+      sashWidth: panelSashWidth,
+    );
 
     final main = Column(
       children: [

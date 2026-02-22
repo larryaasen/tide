@@ -146,8 +146,16 @@ void main() {
 
   final workbenchService = Tide.get<TideWorkbenchService>();
   workbenchService.layoutService.addPanels([
-    TidePanel(panelId: leftPanelId),
-    TidePanel(panelId: mainPanelId),
+    TidePanel(
+      panelId: leftPanelId,
+      minDimension: 100,
+      maxDimension: 450,
+      initialDimension: 220,
+    ),
+    TidePanel(
+      panelId: mainPanelId,
+      layoutSizing: TideLayoutSizing.flexible,
+    ),
   ]);
   workbenchService.layoutService.addActivityBarItems([
     TideActivityBarItem(
@@ -284,24 +292,16 @@ void main() {
           home: TideWindow(
             workbench: TideWorkbench(
                 activityBar: const TideActivityBar(),
-                panelBuilder: (context, panel) {
+                builder: (context, panel) {
                   if (panel.panelId.id == leftPanelId.id) {
-                    return TidePanelWidget(
-                      panelId: panel.panelId,
-                      backgroundColor: const Color(0xFFF3F3F3),
-                      position: TidePosition.left,
-                      resizeSide: TidePosition.right,
-                      minWidth: 100,
-                      maxWidth: 450,
-                      initialWidth: 220,
+                    return Container(
+                      color: const Color(0xFFF3F3F3),
                       child: const Center(child: Text('Left Panel')),
                     );
                   } else if (panel.panelId.id == mainPanelId.id) {
-                    return const TidePanelWidget(
-                      backgroundColor: Colors.white,
-                      expanded: true,
-                      position: TidePosition.center,
-                      child: Center(child: Text('Main Panel')),
+                    return Container(
+                      color: Colors.white,
+                      child: const Center(child: Text('Main Panel')),
                     );
                   }
                   return null;
@@ -337,6 +337,35 @@ If you are upgrading panels from version 1.6.0 or below, here is how things were
     ]),
   );
 ```
+
+#### Migrating from TidePanelWidget (Deprecated)
+
+`TidePanelWidget` is now deprecated. Layout constraints (like `minWidth`, `maxWidth`, and `expanded`) should now be defined on the `TidePanel` model itself, and standard Flutter widgets (like `Container`) should be used for the visual content.
+
+**Previous (Deprecated):**
+```dart
+TidePanel(
+  builder: (context, panel) => TidePanelWidget(
+    backgroundColor: Colors.white,
+    expanded: true,
+    minWidth: 150,
+    child: MyWidget(),
+  ),
+)
+```
+
+**Current (Correct):**
+```dart
+TidePanel(
+  minDimension: 150,
+  layoutSizing: TideLayoutSizing.flexible,
+  builder: (context, panel) => Container(
+    color: Colors.white,
+    child: MyWidget(),
+  ),
+)
+```
+
 
 ### Example 4
 <img src="doc/tide_example_4.png" width="600">
