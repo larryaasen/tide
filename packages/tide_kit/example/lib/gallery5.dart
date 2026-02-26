@@ -3,9 +3,6 @@ import 'package:tide_kit/tide_kit.dart';
 
 /// Example 5: left panel.
 Widget gallery5() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final _ = Tide();
   final workbenchService = Tide.getIt<TideWorkbenchService>();
 

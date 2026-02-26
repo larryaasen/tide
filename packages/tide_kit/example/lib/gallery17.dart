@@ -3,9 +3,6 @@ import 'package:tide_kit/tide_kit.dart';
 
 /// Example 17: A macOS looking left side panel without a status bar.
 Widget gallery17() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final _ = Tide();
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();

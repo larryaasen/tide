@@ -4,9 +4,6 @@ import 'package:tide_kit/tide_kit.dart';
 
 /// Example 15: keyboard binding, custom command, left panel calendar, and main panel.
 Widget gallery15() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final tide = Tide();
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();

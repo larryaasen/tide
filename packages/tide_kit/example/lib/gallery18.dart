@@ -6,9 +6,6 @@ import 'package:tide_kit/tide_kit.dart';
 /// Example 18: Notifications and time services, status bar with progress bar and other items, notifications,
 /// activity bar, with left panel and main panel.
 Widget gallery18() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final tide = Tide();
 
   tide.useServices(services: [

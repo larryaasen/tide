@@ -21,12 +21,8 @@ class TideWorkbench extends StatelessWidget {
     this.backgroudColor = Colors.white,
     this.panelSashColor,
     this.panelSashWidth,
-  }) {
+  }) : workbenchService = Tide.getIt<TideWorkbenchService>() {
     Tide.log("Tide: TideWorkbench created");
-
-    if (!Tide.getIt.isRegistered<TideWorkbenchService>()) {
-      throw Exception('TideWorkbenchService is not registered.');
-    }
   }
 
   final TideActivityBar? activityBar;
@@ -35,8 +31,7 @@ class TideWorkbench extends StatelessWidget {
   final Color? panelSashColor;
   final double? panelSashWidth;
 
-  TideWorkbenchService get workbenchService =>
-      Tide.getIt<TideWorkbenchService>();
+  final TideWorkbenchService workbenchService;
 
   @override
   Widget build(BuildContext context) {

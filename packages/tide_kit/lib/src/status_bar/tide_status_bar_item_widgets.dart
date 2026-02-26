@@ -234,7 +234,7 @@ class TideStatusBarItemTimeWidget extends StatelessWidget {
           'Example:\n'
           '  final tide = Tide();\n'
           '  tide.initialize(services: [Tide.ids.service.time]);');
-      throw Exception('TideTimeService is not registered.');
+      return const SizedBox.shrink();
     }
     return StreamBuilder<TideTimeState>(
       stream: timeService.stream,

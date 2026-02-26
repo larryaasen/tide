@@ -3,11 +3,6 @@ import 'package:tide_kit/tide_kit.dart';
 
 /// Example 10: time status bar item, some text status bar items, and status bar.
 Widget gallery10() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {
-    // ignore
-  }
   final tide = Tide();
   tide.useServices(services: [Tide.ids.service.time]);
 

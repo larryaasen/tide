@@ -3,9 +3,6 @@ import 'package:tide_kit/tide_kit.dart';
 
 /// Example 12: initialization, activity bar, toggle status bar command.
 Widget gallery12() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final tide = Tide();
   tide.useServices(services: [Tide.ids.service.time]);
 

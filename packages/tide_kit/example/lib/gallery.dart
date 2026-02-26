@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:tide_kit/tide_kit.dart';
 
 import 'gallery1.dart' as ex1;
 import 'gallery10.dart' as ex10;
@@ -129,6 +130,36 @@ class _GalleryAppState extends State<GalleryApp> {
     '2': ex2.gallery2,
   };
 
+  final Map<String, String> exampleDescriptions = {
+    '1': 'status bar with no panels.',
+    '2': 'status bar with no panels.',
+    '3': 'status bar with no panels.',
+    '4': 'status bar with no panels.',
+    '5': 'left panel.',
+    '6': 'left and right panels.',
+    '7': 'left and center panels, and status bar.',
+    '8': 'left, middle, right, top, bottom panels, and status bar.',
+    '9':
+        'bottom panel containing a console widget, logging service, and status bar.',
+    '10': 'time status bar item, some text status bar items, and status bar.',
+    '11': 'activity bar.',
+    '12': 'initialization, activity bar, toggle status bar command.',
+    '13': 'keyboard binding and status bar.',
+    '14': 'keyboard binding, custom command, and left panel.',
+    '15':
+        'keyboard binding, custom command, left panel calendar, and main panel.',
+    '16':
+        'add extension with keybinding and time services, and keybinding to toggle the status bar visibility.',
+    '17': 'A macOS looking left side panel without a status bar.',
+    '18':
+        'Notifications and time services, status bar with progress bar and other items, notifications, activity bar, with left panel and main panel.',
+    '19':
+        'An activity bar with four items, and a status bar with a spinner, time, and notifications.',
+    '20':
+        'Quick input box, status bar with item, search panel, and notification.',
+    '21': 'Quick pick input dialog, status bar with item, and notification.',
+  };
+
   @override
   Widget build(BuildContext context) {
     // Sort keys numerically
@@ -142,7 +173,7 @@ class _GalleryAppState extends State<GalleryApp> {
           children: [
             // Internal Sidebar Menu
             Container(
-              width: 200,
+              width: 350,
               color: Colors.grey.shade100,
               child: Column(
                 children: [
@@ -164,11 +195,36 @@ class _GalleryAppState extends State<GalleryApp> {
                       itemBuilder: (context, index) {
                         final k = keys[index];
                         final isSelected = selectedExample == k;
+                        final description = exampleDescriptions[k] ?? '';
                         return ListTile(
-                          title: Text('Example $k'),
+                          title: Text(
+                            'Example $k',
+                            style: TextStyle(
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: isSelected ? Colors.blue.shade900 : null,
+                            ),
+                          ),
+                          subtitle: Text(
+                            description,
+                            style: TextStyle(
+                              color: isSelected
+                                  ? Colors.blue.shade700
+                                  : Colors.black54,
+                            ),
+                          ),
                           selected: isSelected,
-                          selectedTileColor: Colors.blue.withValues(alpha: 0.1),
+                          selectedTileColor:
+                              Colors.blue.withValues(alpha: 0.15),
+                          shape: isSelected
+                              ? RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      color: Colors.blue.shade300, width: 1),
+                                )
+                              : null,
                           onTap: () {
+                            Tide.dispose();
                             setState(() {
                               selectedExample = k;
                             });

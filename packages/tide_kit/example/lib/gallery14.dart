@@ -4,9 +4,6 @@ import 'package:tide_kit/tide_kit.dart';
 
 /// Example 14: keyboard binding, custom command, and left panel.
 Widget gallery14() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final tide = Tide();
 
   tide.useServices(services: [Tide.ids.service.keybindings]);

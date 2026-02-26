@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/tide_workbench_layout_service.dart';
-import '../services/tide_workbench_service.dart';
-import '../tide.dart';
+import '../widgets/tide_workbench_accessor.dart';
 import 'tide_status_bar_item.dart';
 import 'tide_status_bar_item_widgets.dart';
 
@@ -22,10 +21,9 @@ class TideStatusBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final workbenchService = Tide.getIt<TideWorkbenchService>();
-    final statusBarState = workbenchService.accessor
-        .get<TideWorkbenchLayoutService>()
-        .statusBarState;
+    final accessor = TideWorkbenchAccessor.of(context).accessor;
+    final statusBarState =
+        accessor.get<TideWorkbenchLayoutService>().statusBarState;
 
     return ValueListenableBuilder<TideStatusBarState>(
         valueListenable: statusBarState,

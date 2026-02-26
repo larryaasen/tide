@@ -179,7 +179,13 @@ typedef TideCreateHandler = void Function();
 class Tide {
   // static final registry = TideGlobalRegistry();
 
-  static final _getIt = GetIt.asNewInstance();
+  static GetIt _getIt = GetIt.asNewInstance();
+
+  /// Safely releases all registrations inside Tide so that the GetIt registry is completely empty and ready to be used again.
+  /// Calling this drops the internal GetIt registry synchronously, preventing any asynchronous widget state race conditions across rapid layout swaps.
+  static void dispose() {
+    _getIt = GetIt.asNewInstance();
+  }
 
   /// Whether internal Tide log messages are enabled. Defaults to false.
   static bool isInternalLoggingEnabled = false;
@@ -295,16 +301,26 @@ class Tide {
     // Add each optional service to the registry.
 
     // Register the keybinding service.
-    _servicesAvailable[ids.service.keybindings.id] = () =>
+    _servicesAvailable[ids.service.keybindings.id] = () {
+      if (!getIt.isRegistered<TideKeybindingService>()) {
         getIt.registerSingleton<TideKeybindingService>(TideKeybindingService());
+      }
+    };
 
     // Register the notification service.
-    _servicesAvailable[ids.service.notifications.id] = () => getIt
-        .registerSingleton<TideNotificationService>(TideNotificationService());
+    _servicesAvailable[ids.service.notifications.id] = () {
+      if (!getIt.isRegistered<TideNotificationService>()) {
+        getIt.registerSingleton<TideNotificationService>(
+            TideNotificationService());
+      }
+    };
 
     // Register the time service.
-    _servicesAvailable[ids.service.time.id] =
-        () => getIt.registerSingleton<TideTimeService>(TideTimeService());
+    _servicesAvailable[ids.service.time.id] = () {
+      if (!getIt.isRegistered<TideTimeService>()) {
+        getIt.registerSingleton<TideTimeService>(TideTimeService());
+      }
+    };
   }
 
   final List<TideId> _servicesUsed = [];

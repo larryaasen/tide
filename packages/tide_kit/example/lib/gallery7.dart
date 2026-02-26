@@ -3,9 +3,6 @@ import 'package:tide_kit/tide_kit.dart';
 
 /// Example 7: left and center panels, and status bar.
 Widget gallery7() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final _ = Tide();
   final workbenchService = Tide.getIt<TideWorkbenchService>();
 

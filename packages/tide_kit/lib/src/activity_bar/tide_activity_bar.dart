@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../commands/tide_command.dart';
 import '../services/tide_command_service.dart';
 import '../services/tide_workbench_layout_service.dart';
-import '../services/tide_workbench_service.dart';
+
 import '../tide.dart';
 import '../tide_core.dart';
 import '../widgets/tide_workbench_accessor.dart';
@@ -36,14 +36,12 @@ class _TideActivityBarState extends State<TideActivityBar> {
 
   @override
   Widget build(BuildContext context) {
-    final workbenchService = Tide.getIt<TideWorkbenchService>();
+    final accessor = TideWorkbenchAccessor.of(context).accessor;
+    final layoutService = accessor.get<TideWorkbenchLayoutService>();
     return ValueListenableBuilder<TideActivityBarState>(
-      valueListenable: workbenchService.accessor
-          .get<TideWorkbenchLayoutService>()
-          .activityBarState,
+      valueListenable: layoutService.activityBarState,
       builder: (context, state, child) {
-        return _buildInternal(context, state,
-            workbenchService.accessor.get<TideWorkbenchLayoutService>());
+        return _buildInternal(context, state, layoutService);
       },
     );
   }
@@ -106,8 +104,10 @@ class _TideActivityBarState extends State<TideActivityBar> {
 
                 final commandParams = <String, Object>{'_context': context}
                   ..addAll(barItem.commandParams);
-                Tide.getIt<TideCommandService>().registry.executeCommand(
-                    barItem.commandId!, commandParams, accessor);
+                if (Tide.getIt.isRegistered<TideCommandService>()) {
+                  Tide.getIt<TideCommandService>().registry.executeCommand(
+                      barItem.commandId!, commandParams, accessor);
+                }
               }
               setState(() {
                 if (barItem.selectable) _selectedIndex = index;

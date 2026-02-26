@@ -3,9 +3,6 @@ import 'package:tide_kit/tide_kit.dart';
 
 /// Example 11: activity bar.
 Widget gallery11() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final tide = Tide();
   tide.useServices(services: [Tide.ids.service.time]);
 

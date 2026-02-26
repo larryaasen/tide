@@ -49,9 +49,6 @@ class AboutDialogContribution extends TideCommandContribution {
 
 /// Example 19: An activity bar with four items, and a status bar with a spinner, time, and notifications.
 Widget gallery19() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final tide = Tide();
 
   tide.useServices(services: [

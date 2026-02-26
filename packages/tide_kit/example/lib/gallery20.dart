@@ -3,9 +3,6 @@ import 'package:tide_kit/tide_kit.dart';
 
 /// Example 20: Quick input box, status bar with item, search panel, and notification.
 Widget gallery20() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final tide = Tide();
   tide.useServices(services: [
     Tide.ids.service.notifications,

@@ -3,9 +3,6 @@ import 'package:tide_kit/tide_kit.dart';
 
 /// Example 21: Quick pick input dialog, status bar with item, and notification.
 Widget gallery21() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final tide = Tide(focusLogging: true);
   tide.useServices(services: [Tide.ids.service.notifications]);
 

@@ -71,9 +71,6 @@ class MyCalendarExtension extends TideExtension {
 /// Example 16: add extension with keybinding and time services, and keybinding to toggle the
 /// status bar visibility.
 Widget gallery16() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final tide = Tide();
   tide.addExtension(MyCalendarExtension());
 

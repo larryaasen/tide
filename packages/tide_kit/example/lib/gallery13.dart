@@ -4,9 +4,6 @@ import 'package:tide_kit/tide_kit.dart';
 
 /// Example 13: keyboard binding and status bar.
 Widget gallery13() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final tide = Tide();
   tide.useServices(services: [Tide.ids.service.keybindings]);
   final bindings = Tide.getIt<TideKeybindingService>();

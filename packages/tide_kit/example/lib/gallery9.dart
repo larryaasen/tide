@@ -5,9 +5,6 @@ import 'package:tide_kit/tide_kit.dart';
 
 /// Example 9: bottom panel containing a console widget, logging service, and status bar.
 Widget gallery9() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final _ = Tide();
   final logging = TideLoggingService();
   int messageIndex = 1;

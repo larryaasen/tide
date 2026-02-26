@@ -3,9 +3,6 @@ import 'package:tide_kit/tide_kit.dart';
 
 /// Example 8: left, middle, right, top, bottom panels, and status bar.
 Widget gallery8() {
-  try {
-    Tide.getIt.reset();
-  } catch (e) {/* ignore */}
   final _ = Tide();
   final leftPanelId = TideId.uniqueId();
   final mainPanelId = TideId.uniqueId();
